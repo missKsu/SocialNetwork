@@ -27,7 +27,7 @@ namespace SocialNetwork.Controllers
         {
             var group = groupsApi.FindGroupByName(name);
             var userName = usersApi.FindUsersById(group.Creator);
-            return new GroupModel { Name = group.Name, Creator = userName.Name };
+            return new GroupModel { Name = group.Name, Creator = userName.Name, Description = group.Description };
         }
 
         [HttpPost("groups")]

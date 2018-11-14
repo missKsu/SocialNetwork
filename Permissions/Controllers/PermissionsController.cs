@@ -20,14 +20,14 @@ namespace Permissions.Controllers
         }
 
         [HttpGet("user/{id}")]
-        public List<Permission> GetUserPermissionsByName(int id)
+        public ActionResult<List<Permission>> GetUserPermissionsById(int id)
         {
             var result = dbContext.Permissions.Where(p => p.SubjectId == id);
             return result.Select(s => new Permission { Id = s.Id, SubjectType = s.SubjectType, SubjectId = s.SubjectId, ObjectType = s.ObjectType, ObjectId = s.ObjectId, Operation = s.Operation }).ToList();
         }
 
         [HttpGet("{objectType}/{id}/{operation}")]
-        public List<Permission> GetUserPermissionsByObjectAndOperation(Entities.Object objectType ,int id, Operation operation)
+        public ActionResult<List<Permission>> GetUserPermissionsByObjectAndOperation(Entities.Object objectType ,int id, Operation operation)
         {
             var result = dbContext.Permissions.Where(p => p.ObjectType == objectType && p.ObjectId == id && p.Operation == operation);
             return result.Select(s => new Permission { Id = s.Id, SubjectType = s.SubjectType, SubjectId = s.SubjectId, ObjectType = s.ObjectType, ObjectId = s.ObjectId, Operation = s.Operation }).ToList();
