@@ -17,7 +17,6 @@ namespace Groups
 
         protected GroupsDbContext()
         {
-            Initialize();
         }
 
         public DbSet<Group> Groups { get; set; }
@@ -26,7 +25,9 @@ namespace Groups
         {
             if (!Groups.Any())
             {
-                Groups.Add(new Group { Name = "TestGroup", Creator = 1 });
+                Groups.Add(new Group { Name = "TestGroup", Creator = 1, Description = "element1" });
+                Groups.Add(new Group { Name = "TestGroup2", Creator = 1, Description = "element2" });
+                Groups.Add(new Group { Name = "TestGroup3", Creator = 2, Description = "element1" });
                 SaveChanges();
             }
         }

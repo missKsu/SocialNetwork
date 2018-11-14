@@ -16,7 +16,6 @@ namespace Posts
 
         protected PostsDbContext()
         {
-            Initialize();
         }
 
         public DbSet<Post> Posts { get; set; }

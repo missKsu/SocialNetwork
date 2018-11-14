@@ -17,7 +17,6 @@ namespace Users
 
         protected UsersDbContext()
         {
-            Initialize();
         }
 
         public DbSet<User> Users { get; set; }
