@@ -1,2 +1,2 @@
 #!/bin/bash
-dotnet test ${TRAVIS_BUILD_DIR}/Tests
+dotnet Test ${TRAVIS_BUILD_DIR}/Tests

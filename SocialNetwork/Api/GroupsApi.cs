@@ -18,7 +18,12 @@ namespace SocialNetwork.Api
             address = configuration.GetSection("Addresses")["Groups"];
         }
 
-        public Group FindGroupByName(string name)
+        public GroupsApi()
+        {
+
+        }
+
+        public virtual Group FindGroupByName(string name)
         {
             var groupResponse = GetRequest($"{address}groups/{name}");
             string jsonResponse = groupResponse.Content.ReadAsStringAsync().Result;

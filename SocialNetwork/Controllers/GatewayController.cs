@@ -43,5 +43,8 @@ namespace SocialNetwork.Controllers
             var response = groupsApi.AddGroup(body);
             return group;
         }
+        /*
+        [HttpPost("permissions/set/{user}")]
+        public ActionResult<>*/
     }
 }

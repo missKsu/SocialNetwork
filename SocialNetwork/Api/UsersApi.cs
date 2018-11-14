@@ -20,6 +20,11 @@ namespace SocialNetwork.Api
             address = configuration.GetSection("Addresses")["Users"];
         }
 
+        public UsersApi()
+        {
+
+        }
+
         public User FindUser(string name)
         {
             var usersResponse = GetRequest($"{address}users/name/{name}");
@@ -40,7 +45,7 @@ namespace SocialNetwork.Api
             return user.Id;
         }
 
-        public UserModel FindUsersById(int id)
+        public virtual UserModel FindUsersById(int id)
         {
             var usersResponse = GetRequest($"{address}users/id/{id}");
             string jsonString = usersResponse.Content.ReadAsStringAsync().Result;

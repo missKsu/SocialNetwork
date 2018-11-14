@@ -23,12 +23,5 @@ namespace SocialNetwork.Controllers
             this.groupsApi = groupsApi;
             this.logger = logger;
         }
-
-        ////[HttpGet("{name}")]
-        //public ActionResult<Group> FindGroupByName(string name)
-        //{
-        //    logger.LogCritical("In find group by name");
-        //    return groupsApi.FindGroupByName(name);
-        //}
     }
 }

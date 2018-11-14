@@ -20,7 +20,8 @@ namespace Permissions.Entities
         Write,
         Read,
         CantWrite,
-        CantRead
+        CantRead,
+        Admin
     }
 
     public enum Subject
