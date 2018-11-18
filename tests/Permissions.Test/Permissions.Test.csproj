@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Groups\Groups.csproj" />
-    <ProjectReference Include="..\tests\TestsCommon\TestsCommon.csproj" />
+    <ProjectReference Include="..\..\Permissions\Permissions.csproj" />
+    <ProjectReference Include="..\TestsCommon\TestsCommon.csproj" />
   </ItemGroup>
 
 </Project>
