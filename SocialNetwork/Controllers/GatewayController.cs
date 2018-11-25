@@ -43,8 +43,12 @@ namespace SocialNetwork.Controllers
             var response = groupsApi.AddGroup(body);
             return group;
         }
-        /*
-        [HttpPost("permissions/set/{user}")]
-        public ActionResult<>*/
+        
+        [HttpPut("groups/merge/{group}")]
+        public ActionResult<GroupModel> MergeOneGroupWithAnother(string group, string with)
+        {
+
+            return null;
+        }
     }
 }

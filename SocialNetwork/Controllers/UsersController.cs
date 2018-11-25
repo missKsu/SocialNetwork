@@ -29,7 +29,28 @@ namespace SocialNetwork.Controllers
         [HttpPost()]
         public ActionResult<UserModel> AddUser(UserModel userModel)
         {
-            return usersApi.AddUser(userModel);
+            return RedirectToAction(nameof(GetAllUsers));
+            //return usersApi.AddUser(userModel);
+        }
+
+        [HttpGet]
+        public ActionResult GetAllUsers()
+        {
+            var users = new[]
+            {
+                new UserModel{ Name = "Ivan"},
+                new UserModel{ Name = "John"}
+            };
+
+            var model = new AllUsersModel { Users = users.ToList() };
+
+            return View(model);
+        }
+
+        [HttpGet("new")]
+        public ActionResult NewUser()
+        {
+            return View();
         }
     }
 }
