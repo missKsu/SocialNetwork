@@ -61,6 +61,14 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public AllUsersModel GetAllUsers()
+        {
+            var usersResponse = GetRequest($"{address}users/");
+            string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
+            var users = JsonConvert.DeserializeObject<List<User>>(jsonString);
+            return Convert(users);
+        }
+
         private User Convert(UserModel userModel)
         {
             return new User { Name = userModel.Name };
@@ -69,6 +77,16 @@ namespace SocialNetwork.Api
         private UserModel Convert(User user)
         {
             return new UserModel { Name = user.Name };
+        }
+
+        private AllUsersModel Convert(List<User> users)
+        {
+            var Users = new AllUsersModel { Users = new List<UserModel> { } };
+            foreach (var user in users)
+            {
+                Users.Users.Add(Convert(user));
+            }
+            return Users;
         }
     }
 }

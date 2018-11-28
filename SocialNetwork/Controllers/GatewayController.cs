@@ -26,7 +26,15 @@ namespace SocialNetwork.Controllers
         public ActionResult<GroupModel> FindGroupByName(string name)
         {
             var group = groupsApi.FindGroupByName(name);
+            if (group == null)
+            {
+                return StatusCode(404);
+            }
             var userName = usersApi.FindUsersById(group.Creator);
+            if (userName == null)
+            {
+                return StatusCode(404);
+            }
             return new GroupModel { Name = group.Name, Creator = userName.Name, Description = group.Description };
         }
 
@@ -43,7 +51,21 @@ namespace SocialNetwork.Controllers
             var response = groupsApi.AddGroup(body);
             return group;
         }
-        
+
+        [HttpGet]
+        public ActionResult GetAllGroups()
+        {
+            var users = new[]
+            {
+                new GroupModel{ Name = "Ivan"},
+                new GroupModel{ Name = "John"}
+            };
+
+            var model = new AllGroupsModel { Groups = users.ToList() };
+
+            return View(model);
+        }
+
         [HttpPut("groups/merge/{group}")]
         public ActionResult<GroupModel> MergeOneGroupWithAnother(string group, string with)
         {

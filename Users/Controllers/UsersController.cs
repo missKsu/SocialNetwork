@@ -32,6 +32,12 @@ namespace Users.Controllers
             return dbContext.Users.SingleOrDefault(u => u.Name == name);
         }
 
+        [HttpGet()]
+        public ActionResult<List<User>> GetAllUsers()
+        {
+            return dbContext.Users.ToList();
+        }
+
         [HttpPost]
         public ActionResult AddUser([FromBody]User user)
         {
