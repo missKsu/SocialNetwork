@@ -26,7 +26,7 @@ namespace SocialNetwork.Controllers
             return usersApi.FindUsersByName(name);
         }
 
-        [HttpPost()]
+        [HttpPost]
         public ActionResult<UserModel> AddUser(UserModel userModel)
         {
             return usersApi.AddUser(userModel);
