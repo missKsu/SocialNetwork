@@ -34,8 +34,7 @@ namespace SocialNetwork.Api
         public Group AddGroup(Group group)
         {
             var response = PostRequest($"{address}groups", group);
-            if (response.
-                == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return group;
             return null;
         }
