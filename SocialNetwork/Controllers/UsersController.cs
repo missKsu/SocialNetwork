@@ -33,6 +33,7 @@ namespace SocialNetwork.Controllers
             return usersApi.AddUser(userModel);
         }
 
+        [HttpPost("addbyif")]
         public ActionResult<UserModel> AddUserByIf(UserModel userModel)
         {
             var result = AddUser(userModel);
@@ -49,6 +50,12 @@ namespace SocialNetwork.Controllers
 
         [HttpGet("new")]
         public ActionResult NewUser()
+        {
+            return View();
+        }
+
+        [HttpGet("edit")]
+        public ActionResult EditUser()
         {
             return View();
         }
