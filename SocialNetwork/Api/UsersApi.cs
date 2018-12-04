@@ -61,6 +61,14 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public UserModel EditUser(string name, UserModel userModel)
+        {
+            var response = PutRequest($"{address}users/user/",name, Convert(userModel));
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                return userModel;
+            return null;
+        }
+
         public AllUsersModel GetAllUsers()
         {
             var usersResponse = GetRequest($"{address}users/");
