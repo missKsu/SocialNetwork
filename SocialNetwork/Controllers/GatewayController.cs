@@ -52,16 +52,10 @@ namespace SocialNetwork.Controllers
             return group;
         }
 
-        [HttpGet]
+        [HttpGet("groups")]
         public ActionResult GetAllGroups()
         {
-            var users = new[]
-            {
-                new GroupModel{ Name = "Ivan"},
-                new GroupModel{ Name = "John"}
-            };
-
-            var model = new AllGroupsModel { Groups = users.ToList() };
+            var model = groupsApi.GetAllGroups();
 
             return View(model);
         }
