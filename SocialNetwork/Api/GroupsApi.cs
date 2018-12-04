@@ -39,6 +39,14 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public AllGroupsModel GetAllGroups()
+        {
+            var groupsResponse = GetRequest($"{address}groups/");
+            string jsonString = groupsResponse.Content.ReadAsStringAsync().Result;
+            var groups = JsonConvert.DeserializeObject<List<Group>>(jsonString);
+            return Convert(groups);
+        }
+
         public Group Convert(GroupModel groupModel)
         {
             return new Group { Name = groupModel.Name };
@@ -47,6 +55,18 @@ namespace SocialNetwork.Api
         public GroupModel Convert(Group group)
         {
             return new GroupModel { Name = group.Name };
+        }
+
+        private AllGroupsModel Convert(List<Group> groups)
+        {
+            var Gr = new AllGroupsModel { Groups = new List<GroupModel> { } };
+            //var Groups = new AllGroupsModel { Groups = new List<GroupModel> { } };
+            foreach (var group in groups)
+            {
+                Gr.Groups.Add(new GroupModel { Name = group.Name, Creator = "TestUser"});
+                //Users.Users.Add(Convert(user));
+            }
+            return Gr;
         }
     }
 
