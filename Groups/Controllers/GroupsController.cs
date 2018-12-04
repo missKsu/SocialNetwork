@@ -84,6 +84,12 @@ namespace Groups.Controllers
             return StatusCode(400);
         }
 
+        [HttpGet()]
+        public ActionResult<List<Group>> GetAllGroups()
+        {
+            return dbContext.Groups.ToList();
+        }
+
         [HttpDelete("group/{name}")]
         public ActionResult DeleteGroup(string name)
         {
