@@ -48,7 +48,7 @@ namespace Users.Controllers
         }
 
         [HttpPut("user/{name}")]
-        public ActionResult UpdateUser(string name, string newName)
+        public ActionResult UpdateUser(string name, [FromBody]string newName)
         {
             var isExist = dbContext.Users.FirstOrDefault(u => u.Name == newName);
             if (isExist == null)
@@ -60,6 +60,7 @@ namespace Users.Controllers
                 }
                 user.Name = newName;
                 dbContext.Users.Update(user);
+                dbContext.SaveChanges();
                 return StatusCode(200);
             }
             return StatusCode(400);
@@ -72,9 +73,16 @@ namespace Users.Controllers
             if(user != null)
             {
                 dbContext.Users.Remove(user);
+                dbContext.SaveChanges();
                 return StatusCode(200);
             }
             return StatusCode(422);
+        }
+
+        [HttpGet()]
+        public ActionResult<List<User>> GetAllUsers()
+        {
+            return dbContext.Users.ToList();
         }
     }
 }
