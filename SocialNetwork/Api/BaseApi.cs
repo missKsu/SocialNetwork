@@ -35,5 +35,13 @@ namespace SocialNetwork.Api
                     new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
             }
         }
+
+        protected HttpResponseMessage DeleteRequest(string address, object extadd)
+        {
+            using (var client = new HttpClient())
+            {
+                return client.DeleteAsync(address + extadd.ToString()).Result;
+            }
+        }
     }
 }
