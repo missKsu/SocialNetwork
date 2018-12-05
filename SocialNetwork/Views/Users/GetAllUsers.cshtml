@@ -10,8 +10,8 @@
             <tr>
                 <td width="90%">@userModel.Name</td>
                 <td>
-                    <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditUser"></a>
-                    <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeleteUser"></a>
+                    <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditUser" asp-route-name=@userModel.Name></a>
+                    <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeleteUser" asp-route-name=@userModel.Name></a>
                 </td>
             </tr>
         }
