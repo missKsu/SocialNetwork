@@ -34,7 +34,7 @@ namespace SocialNetwork.Controllers
         public ActionResult<GroupModel> AddGroup(GroupModel group)
         {
             var creator = usersApi.FindIdUserByName(group.Creator);
-            if(creator == 0)
+            if(creator == null)
             {
                 return null;
             }
@@ -43,8 +43,22 @@ namespace SocialNetwork.Controllers
             var response = groupsApi.AddGroup(body);
             return group;
         }
-        /*
-        [HttpPost("permissions/set/{user}")]
-        public ActionResult<>*/
+
+        [HttpGet("groups")]
+        public ActionResult<List<GroupModel>> GetAllGroups()
+        {
+            var result = groupsApi.GetAllGroups();
+            var groups = new List<GroupModel> { };
+            if (result != null)
+            {
+                foreach(var group in result)
+                {
+                    var creator = usersApi.FindUsersById(group.Creator);
+                    if (creator != null)
+                        groups.Add(new GroupModel { Name = group.Name, Description = group.Description, Creator = creator.Name });
+                }
+            }
+            return groups;
+        }
     }
 }
