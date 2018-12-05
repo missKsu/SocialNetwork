@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Groups.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,13 @@ namespace SocialNetwork.Controllers
         {
             this.groupsApi = groupsApi;
             this.logger = logger;
+        }
+
+        [HttpDelete("group/{name}")]
+        public ActionResult<HttpStatusCode> DeleteUser(string name)
+        {
+            var result = groupsApi.DeleteGroup(name);
+            return result.StatusCode;
         }
     }
 }
