@@ -91,9 +91,16 @@ namespace Groups.Controllers
             if (group != null)
             {
                 dbContext.Groups.Remove(group);
+                dbContext.SaveChanges();
                 return StatusCode(200);
             }
             return StatusCode(422);
+        }
+
+        [HttpGet()]
+        public ActionResult<List<Group>> GetAllGroups()
+        {
+            return dbContext.Groups.ToList();
         }
     }
 }
