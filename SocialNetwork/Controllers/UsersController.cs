@@ -40,6 +40,23 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(GetAllUsers));
         }
 
+        [HttpPost("editbyif")]
+        public ActionResult<UserModel> EditUserByIf(EditUserModel userModel)
+        {
+            var result = usersApi.EditUser(userModel.OriginalName, new UserModel { Name = userModel.NewName});
+            return RedirectToAction(nameof(GetAllUsers));
+        }
+
+        [HttpPost("deletebyif")]
+        public ActionResult<UserModel> DeleteUserByIf(DeleteUserModel userModel)
+        {
+            /*
+            var result = usersApi.DeleteUser(userModel.Name);
+            return RedirectToAction(nameof(GetAllUsers));
+            */
+            return null;
+        }
+
         [HttpGet]
         public ActionResult GetAllUsers()
         {
@@ -55,9 +72,18 @@ namespace SocialNetwork.Controllers
         }
 
         [HttpGet("edit")]
-        public ActionResult EditUser()
+        public ActionResult EditUser(string name)
         {
-            return View();
+            var user = usersApi.FindUser(name);
+            var modifiedUser = new EditUserModel { OriginalName = user.Name, NewName = user.Name};
+            return View(modifiedUser);
+        }
+
+        [HttpGet("delete")]
+        public ActionResult DeleteUser(string name)
+        {
+            var user = new DeleteUserModel { Name = name};
+            return View(user);
         }
     }
 }
