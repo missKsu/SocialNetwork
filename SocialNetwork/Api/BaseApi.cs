@@ -26,5 +26,22 @@ namespace SocialNetwork.Api
                 return client.GetAsync(address).Result;
             }
         }
+
+        protected HttpResponseMessage PutRequest(string address, object extadd, object obj)
+        {
+            using (var client = new HttpClient())
+            {
+                return client.PutAsync(address + extadd.ToString(),
+                    new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
+            }
+        }
+
+        protected HttpResponseMessage DeleteRequest(string address, object extadd)
+        {
+            using (var client = new HttpClient())
+            {
+                return client.DeleteAsync(address + extadd.ToString()).Result;
+            }
+        }
     }
 }
