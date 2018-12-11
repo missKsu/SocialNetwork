@@ -28,6 +28,8 @@ namespace SocialNetwork
         {
             services.AddTransient<UsersApi>();
             services.AddTransient<GroupsApi>();
+            services.AddTransient<PostsApi>();
+            services.AddTransient<PermissionsApi>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

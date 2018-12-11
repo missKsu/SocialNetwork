@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Groups\Groups.csproj" />
+    <ProjectReference Include="..\Permissions\Permissions.csproj" />
+    <ProjectReference Include="..\Posts\Posts.csproj" />
     <ProjectReference Include="..\Users\Users.csproj" />
   </ItemGroup>
 
