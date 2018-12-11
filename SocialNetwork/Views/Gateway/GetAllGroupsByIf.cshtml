@@ -1,0 +1,25 @@
+﻿@model SocialNetwork.Models.Groups.AllGroupsModel
+
+<div width="10%" style="float:left">
+    <a class="btn btn-success glyphicon glyphicon-plus" asp-action="NewGroup"></a>
+</div>
+<div style="float:left">
+    <table class="table">
+        @foreach (var groupModel in Model.Groups)
+        {
+        <tr>
+            <td width="20%">@groupModel.Name</td>
+            <td width="20%">@groupModel.Creator</td>
+            <td width="50%">@groupModel.Description</td>
+            <td>
+                <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditGroup"></a>
+                <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeleteGroup"></a>
+                <a class="btn btn-danger glyphicon glyphicon-list btn-xs" asp-action="AllGroupPosts"></a>
+            </td>
+        </tr>
+        }
+    </table>
+</div>
+
+
+

@@ -1,7 +1,7 @@
 ﻿@model SocialNetwork.Models.Users.DeleteUserModel
 
 <form asp-controller="Users"
-      method="post">
+      method="get">
     <h2>Are you sure you want to delete user @Model.Name?</h2>
     <a asp-action="DeleteUserByIf" asp-route-name=@Model.Name class="btn btn-success">Yes</a>
     <a asp-action="GetAllUsers" class="btn btn-danger">No</a>
