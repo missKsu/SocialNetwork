@@ -121,10 +121,11 @@ namespace SocialNetwork.Controllers
             return new PaginatedList<PostModel>(posts, perpage, page, result.Item2);
         }
 
-        [HttpGet("groups")]
-        public ActionResult GetAllGroups()
+        [HttpGet("if/groups")]
+        public ActionResult GetAllGroupsByIf()
         {
-            var model = groupsApi.GetAllGroups();
+            var result = GetAllGroups();
+            var model = new AllGroupsModel { Groups = result.Value};
 
             return View(model);
         }
