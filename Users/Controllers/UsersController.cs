@@ -84,11 +84,5 @@ namespace Users.Controllers
             }
             return StatusCode(422);
         }
-
-        [HttpGet()]
-        public ActionResult<List<User>> GetAllUsers()
-        {
-            return dbContext.Users.ToList();
-        }
     }
 }
