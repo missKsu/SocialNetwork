@@ -33,6 +33,14 @@ namespace SocialNetwork.Api
             return group;
         }
 
+        public virtual Group FindGroupById(int id)
+        {
+            var groupResponse = GetRequest($"{address}groups/id/{id}");
+            string jsonResponse = groupResponse.Content.ReadAsStringAsync().Result;
+            var group = JsonConvert.DeserializeObject<Group>(jsonResponse);
+            return group;
+        }
+
         public Group AddGroup(Group group)
         {
             var response = PostRequest($"{address}groups/group", group);
