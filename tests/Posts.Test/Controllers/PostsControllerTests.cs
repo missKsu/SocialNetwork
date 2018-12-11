@@ -52,11 +52,11 @@ namespace Posts.Test.Controllers
             var controller = CreateControllerWithPosts(post1, post2, post3);
 
             // act
-            var result = controller.FindPostsByAuthor(1);
+            var result = controller.FindPostsByAuthor(1,1,2);
 
             // assert
             var expected = new List<Post>(new Post[] { post1, post2 });
-            result.Value.Should().BeEquivalentTo(expected);
+            result.Item1.Value.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -66,10 +66,10 @@ namespace Posts.Test.Controllers
             var controller = CreateControllerWithPosts();
 
             // act
-            var result = controller.FindPostsByAuthor(1);
+            var result = controller.FindPostsByAuthor(1,1,2);
 
             // assert
-            result.Value.Should().BeEmpty();
+            result.Item1.Value.Should().BeEmpty();
         }
 
         [Fact]
