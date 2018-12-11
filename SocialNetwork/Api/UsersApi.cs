@@ -20,6 +20,11 @@ namespace SocialNetwork.Api
             address = configuration.GetSection("Addresses")["Users"];
         }
 
+        public UsersApi()
+        {
+
+        }
+
         public User FindUser(string name)
         {
             var usersResponse = GetRequest($"{address}users/name/{name}");
@@ -40,12 +45,14 @@ namespace SocialNetwork.Api
             return user.Id;
         }
 
-        public UserModel FindUsersById(int id)
+        public virtual UserModel FindUsersById(int id)
         {
             var usersResponse = GetRequest($"{address}users/id/{id}");
             string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
             var users = JsonConvert.DeserializeObject<User>(jsonString);
-            return new UserModel { Name = users.Name};
+            if (users != null)
+                return new UserModel { Name = users.Name };
+            return null;
         }
 
         public UserModel AddUser(UserModel userModel)
@@ -56,6 +63,28 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public UserModel EditUser(string name, string newName)
+        {
+            var response = PutRequest($"{address}users/user/", name, newName);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                return new UserModel { Name = newName};
+            return null;
+        }
+
+        public AllUsersModel GetAllUsers()
+        {
+            var usersResponse = GetRequest($"{address}users/");
+            string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
+            var users = JsonConvert.DeserializeObject<List<User>>(jsonString);
+            return Convert(users);
+        }
+
+        public HttpResponseMessage DeleteUser(string name)
+        {
+            var userResponse = DeleteRequest($"{address}users/user/",name);
+            return userResponse;
+        }
+
         private User Convert(UserModel userModel)
         {
             return new User { Name = userModel.Name };
@@ -64,6 +93,16 @@ namespace SocialNetwork.Api
         private UserModel Convert(User user)
         {
             return new UserModel { Name = user.Name };
+        }
+
+        private AllUsersModel Convert(List<User> users)
+        {
+            var Users = new AllUsersModel { Users = new List<UserModel> { } };
+            foreach (var user in users)
+            {
+                Users.Users.Add(Convert(user));
+            }
+            return Users;
         }
     }
 }

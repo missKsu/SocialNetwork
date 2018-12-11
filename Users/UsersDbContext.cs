@@ -17,7 +17,6 @@ namespace Users
 
         protected UsersDbContext()
         {
-            Initialize();
         }
 
         public DbSet<User> Users { get; set; }
@@ -26,7 +25,8 @@ namespace Users
         {
             if (Users.Count() == 0)
             {
-                Users.Add(new User { Name = "TestUser" });
+                Users.Add(new User { Name = "TestUser1" });
+                Users.Add(new User { Name = "TestUser2" });
                 SaveChanges();
             }
         }
