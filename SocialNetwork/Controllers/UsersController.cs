@@ -39,28 +39,25 @@ namespace SocialNetwork.Controllers
         public ActionResult<UserModel> AddUserByIf(UserModel userModel)
         {
             var result = AddUser(userModel);
-            return RedirectToAction(nameof(GetAllUsers));
+            return RedirectToAction(nameof(GetAllUsersByIf));
         }
 
         [HttpPost("editbyif")]
         public ActionResult<UserModel> EditUserByIf(EditUserModel userModel)
         {
             var result = usersApi.EditUser(userModel.OriginalName, new UserModel { Name = userModel.NewName});
-            return RedirectToAction(nameof(GetAllUsers));
+            return RedirectToAction(nameof(GetAllUsersByIf));
         }
 
-        [HttpPost("deletebyif")]
-        public ActionResult<UserModel> DeleteUserByIf(DeleteUserModel userModel)
+        [HttpGet("deletebyif")]
+        public ActionResult<UserModel> DeleteUserByIf(string name)
         {
-            /*
-            var result = usersApi.DeleteUser(userModel.Name);
-            return RedirectToAction(nameof(GetAllUsers));
-            */
-            return null;
+            var result = usersApi.DeleteUser(name);
+            return RedirectToAction(nameof(GetAllUsersByIf));
         }
 
-        [HttpGet]
-        public ActionResult GetAllUsers()
+        [HttpGet("all")]
+        public ActionResult GetAllUsersByIf()
         {
             var model = usersApi.GetAllUsers();
 
@@ -74,7 +71,7 @@ namespace SocialNetwork.Controllers
         }
 
         [HttpGet("edit")]
-        public ActionResult EditUser(string name)
+        public ActionResult EditUserIf(string name)
         {
             var user = usersApi.FindUser(name);
             var modifiedUser = new EditUserModel { OriginalName = user.Name, NewName = user.Name};
@@ -82,7 +79,7 @@ namespace SocialNetwork.Controllers
         }
 
         [HttpGet("delete")]
-        public ActionResult DeleteUser(string name)
+        public ActionResult DeleteUserIf(string name)
         {
             var user = new DeleteUserModel { Name = name};
             return View(user);
