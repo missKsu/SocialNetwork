@@ -108,11 +108,5 @@ namespace Groups.Controllers
             }
             return StatusCode(422);
         }
-
-        [HttpGet()]
-        public ActionResult<List<Group>> GetAllGroups()
-        {
-            return dbContext.Groups.ToList();
-        }
     }
 }
