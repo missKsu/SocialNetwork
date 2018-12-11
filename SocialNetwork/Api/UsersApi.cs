@@ -71,12 +71,10 @@ namespace SocialNetwork.Api
             return null;
         }
 
-        public string DeleteUser(string name)
+        public HttpResponseMessage DeleteUser(string name)
         {
             var response = DeleteRequest($"{address}users/user/", name);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                return name;
-            return null;
+            return response;
         }
 
         public UserModel EditUser(string name, UserModel userModel)
