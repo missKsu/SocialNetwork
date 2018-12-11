@@ -25,6 +25,7 @@ namespace Posts
             if (!Posts.Any())
             {
                 Posts.Add(new Post { Author = 1, Group = 1, Text = "Very long post."});
+                Posts.Add(new Post { Author = 1, Group = 1, Text = "More long than previous." });
                 SaveChanges();
             }
         }

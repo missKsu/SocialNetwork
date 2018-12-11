@@ -50,7 +50,9 @@ namespace SocialNetwork.Api
             var usersResponse = GetRequest($"{address}users/id/{id}");
             string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
             var users = JsonConvert.DeserializeObject<User>(jsonString);
-            return new UserModel { Name = users.Name};
+            if (users != null)
+                return new UserModel { Name = users.Name };
+            return null;
         }
 
         public UserModel AddUser(UserModel userModel)
@@ -58,6 +60,14 @@ namespace SocialNetwork.Api
             var response = PostRequest($"{address}users", Convert(userModel));
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return userModel;
+            return null;
+        }
+
+        public UserModel EditUser(string name, string newName)
+        {
+            var response = PutRequest($"{address}users/user/", name, newName);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                return new UserModel { Name = newName};
             return null;
         }
 

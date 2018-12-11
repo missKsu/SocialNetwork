@@ -24,7 +24,9 @@ namespace SocialNetwork.Test.Controllers
             Group group = new Group { Name = "Group", Creator = 1, Description = "public" };
             var groupsApi = Mock.Of<GroupsApi>(api => api.FindGroupByName(It.IsAny<string>()) == group);
 
-            var controller = new GatewayController(usersApi, groupsApi);
+            var postsApi = Mock.Of<PostsApi>();
+
+            var controller = new GatewayController(usersApi, groupsApi, postsApi);
             var result = controller.FindGroupByName("Group");
 
             // assert

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Api;
@@ -26,7 +28,7 @@ namespace SocialNetwork.Controllers
             return usersApi.FindUsersByName(name);
         }
 
-        [HttpPost()]
+        [HttpPost]
         public ActionResult<UserModel> AddUser(UserModel userModel)
         {
             //return RedirectToAction(nameof(GetAllUsers));
@@ -84,6 +86,25 @@ namespace SocialNetwork.Controllers
         {
             var user = new DeleteUserModel { Name = name};
             return View(user);
+        }
+
+        [HttpPut("user/{name}")]
+        public ActionResult<UserModel> EditUser(string name, string newName)
+        {
+            return usersApi.EditUser(name,newName);
+        }
+
+        [HttpGet]
+        public ActionResult<AllUsersModel> GetAllUsers()
+        {
+            return usersApi.GetAllUsers();
+        }
+
+        [HttpDelete("user/{name}")]
+        public ActionResult<HttpStatusCode> DeleteUser(string name)
+        {
+            var result = usersApi.DeleteUser(name);
+            return result.StatusCode;
         }
     }
 }

@@ -27,17 +27,33 @@ namespace Posts.Controllers
         }
 
         [HttpGet("author/{author}")]
-        public ActionResult<List<Post>> FindPostsByAuthor(int author)
+        public (List<Post>,int) FindPostsByAuthor(int author, int page, int perpage)
         {
             var result = dbContext.Posts.Where(p => p.Author == author);
-            return result.Select(s => new Post { Id = s.Id, Author = s.Author, Group = s.Group, Text = s.Text }).ToList();
+            result = result.OrderByDescending(n => n.Text);
+            int maxPage = result.Count() / perpage + (result.Count() % perpage == 0 ? 0 : 1);
+            if (page != 0)
+            {
+                result = result.Skip(perpage * (page-1));
+            }
+            result = result.Take(perpage);
+
+            return (result.ToList(),maxPage);
         }
 
         [HttpGet("group/{group}")]
-        public ActionResult<List<Post>> FindPostsByGroup(int group)
+        public (List<Post>, int) FindPostsByGroup(int group, int page, int perpage)
         {
             var result = dbContext.Posts.Where(p => p.Group == group);
-            return result.Select(s => new Post { Id = s.Id, Author = s.Author, Group = s.Group, Text = s.Text }).ToList();
+            result = result.OrderByDescending(n => n.Text);
+            int maxPage = result.Count() / perpage + (result.Count() % perpage == 0 ? 0 : 1);
+            if (page != 0)
+            {
+                result = result.Skip(perpage * (page - 1));
+            }
+            result = result.Take(perpage);
+
+            return (result.ToList(), maxPage);
         }
 
         [HttpPut("post/{id}")]

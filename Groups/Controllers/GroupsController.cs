@@ -25,6 +25,12 @@ namespace Groups.Controllers
             return dbContext.Groups.FirstOrDefault(g => g.Name == name);
         }
 
+        [HttpGet("id/{id}")]
+        public ActionResult<Group> FindGroupById(int id)
+        {
+            return dbContext.Groups.FirstOrDefault(g => g.Id == id);
+        }
+
         [HttpPost("group")]
         public ActionResult AddGroup([FromBody]Group group)
         {
@@ -97,9 +103,16 @@ namespace Groups.Controllers
             if (group != null)
             {
                 dbContext.Groups.Remove(group);
+                dbContext.SaveChanges();
                 return StatusCode(200);
             }
             return StatusCode(422);
+        }
+
+        [HttpGet()]
+        public ActionResult<List<Group>> GetAllGroups()
+        {
+            return dbContext.Groups.ToList();
         }
     }
 }

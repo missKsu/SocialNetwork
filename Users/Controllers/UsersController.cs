@@ -79,9 +79,16 @@ namespace Users.Controllers
             if(user != null)
             {
                 dbContext.Users.Remove(user);
+                dbContext.SaveChanges();
                 return StatusCode(200);
             }
             return StatusCode(422);
+        }
+
+        [HttpGet()]
+        public ActionResult<List<User>> GetAllUsers()
+        {
+            return dbContext.Users.ToList();
         }
     }
 }
