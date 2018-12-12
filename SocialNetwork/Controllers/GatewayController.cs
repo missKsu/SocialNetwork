@@ -136,5 +136,55 @@ namespace SocialNetwork.Controllers
 
             return null;
         }
+
+        [HttpGet("new")]
+        public ActionResult NewGroup()
+        {
+            return View();
+        }
+
+        [HttpPost("addbyif")]
+        public ActionResult<GroupModel> AddGroupByIf(GroupModel groupModel)
+        {
+            var result = AddGroup(groupModel);
+            return RedirectToAction(nameof(GetAllGroupsByIf));
+        }
+
+        [HttpGet("delete")]
+        public ActionResult DeleteGroupIf(string name)
+        {
+            var group = new DeleteGroupModel { GroupName = name };
+            return View(group);
+        }
+
+        [HttpPost("deletebyif")]
+        public ActionResult<GroupModel> DeleteGroupByIf(DeleteGroupModel groupModel)
+        {
+            var result = groupsApi.DeleteGroup(groupModel.GroupName);
+            return RedirectToAction(nameof(GetAllGroupsByIf));
+        }
+
+        [HttpGet("edit")]
+        public ActionResult EditGroupIf(string name)
+        {
+            var group = groupsApi.FindGroupByName(name);
+            var modifiedGroup = new EditGroupModel { Name = group.Name, NewName = group.Name, Creator = group.Creator, Description = group.Description, NewDescription = group.Description};
+            return View(modifiedGroup);
+        }
+
+        [HttpPost("editbyif")]
+        public ActionResult<GroupModel> EditGroupByIf(EditGroupModel groupModel)
+        {
+            var result = groupsApi.EditGroup(groupModel.Name, groupModel.NewName, groupModel.NewDescription);
+            return RedirectToAction(nameof(GetAllGroupsByIf));
+        }
+
+        [HttpGet("posts")]
+        public ActionResult<AllPostsModel> PartOfPosts(string name, int page)
+        {
+            var result = GetPostsByGroup(name,page+1,1);
+            var posts = new AllPostsModel { Posts = result.Value.Content, page = result.Value.Page };
+            return View(posts);
+        }
     }
 }
