@@ -1,0 +1,25 @@
+﻿@model SocialNetwork.Models.Posts.AllPostsModel
+
+<div width="10%" style="float:left">
+    <a class="btn btn-success glyphicon glyphicon-plus" asp-action="NewPost"></a>
+</div>
+<div style="float:left">
+    <table class="table">
+        @foreach (var postModel in Model.Posts)
+        {
+            <tr>
+                <td width="30%">@postModel.Author</td>
+                <td width="60%">@postModel.Text</td>
+                <td>
+                    <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditGroupIf"></a>
+                    <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeleteGroupIf"></a>
+                </td>
+            </tr>
+        }
+    </table>
+    <p>Page: @Model.page</p>
+    <a asp-action="PartOfPosts" asp-route-name="@Model.Posts.First().Group" asp-route-page="@Model.page" class="btn btn-primary">Next page</a>
+</div>
+
+
+

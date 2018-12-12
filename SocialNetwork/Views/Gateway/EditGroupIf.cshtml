@@ -1,0 +1,28 @@
+﻿@model SocialNetwork.Models.Groups.EditGroupModel
+
+<div class="row">
+    <div class="col-md-2">
+        <form asp-controller="Gateway"
+              method="post">
+            <div class="form-group">
+                <p>
+                    <label class="control-label">Your name:</label>
+                    <input name="User" class="form-control" type="text" required />
+                </p>
+                <p>
+                    <label class="control-label">Name:</label>
+                    <input name="NewName" class="form-control" type="text" required value=@Model.NewName />
+                    <input name="Name" style="visibility:collapse" value="@Model.Name" />
+                </p>
+                <p>
+                    <label class="control-label">Description:</label>
+                    <input name="NewDescription" class="form-control" type="text" required value=@Model.NewDescription />
+                    <input name="Name" style="visibility:collapse" value="@Model.Description" />
+                </p>
+                <input name="Creator" style="visibility:collapse" value="@Model.Creator" />
+            </div>
+            <input type="submit" class="btn btn-primary" asp-action="EditGroupByIf" value="Change" />
+        </form>
+    </div>
+</div>
+
