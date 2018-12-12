@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,12 +30,15 @@ namespace SocialNetwork.Api
             }
         }
 
-        protected HttpResponseMessage PutRequest(string address, object extadd, object obj)
+        protected HttpResponseMessage PutRequest(string address, object extadd, IDictionary<string,string> obj)
         {
             using (var client = new HttpClient())
             {
-                return client.PutAsync(address+extadd.ToString(),
-                    new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
+                return client.PutAsJsonAsync(address+extadd.ToString(), obj).Result;
+                //return client.PutAsync(address + extadd.ToString(),
+                    //httpContent).Result;
+                    //new FormUrlEncodedContent(obj)).Result;
+                    //new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
             }
         }
 
