@@ -65,7 +65,9 @@ namespace SocialNetwork.Api
 
         public UserModel EditUser(string name, string newName)
         {
-            var response = PutRequest($"{address}users/user/", name, newName);
+            var body = new Dictionary<string, string>();
+            body["newName"] = newName;
+            var response = PutRequest($"{address}users/user/", name, body);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return new UserModel { Name = newName};
             return null;
@@ -80,7 +82,9 @@ namespace SocialNetwork.Api
         public UserModel EditUser(string name, UserModel userModel)
         {
             var newName = userModel.Name;
-            var response = PutRequest($"{address}users/user/",name, newName);
+            var body = new Dictionary<string, string>();
+            body["newName"] = newName;
+            var response = PutRequest($"{address}users/user/",name, body);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return userModel;
             return null;
