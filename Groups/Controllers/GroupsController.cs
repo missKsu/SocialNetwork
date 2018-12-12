@@ -58,7 +58,7 @@ namespace Groups.Controllers
         }
 
         [HttpPut("group/{name}")]
-        public ActionResult UpdateGroup(string name, string newName, string newDescription)
+        public ActionResult UpdateGroup(string name, [FromBody]string newName, [FromBody]string newDescription)
         {
             var isExist = dbContext.Groups.FirstOrDefault(g => g.Name == newName);
             if (isExist == null)
