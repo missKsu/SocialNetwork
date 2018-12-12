@@ -49,6 +49,15 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public HttpResponseMessage EditGroup(string name, string newName, string newDescription)
+        {
+            var body = new Dictionary<string, string>();
+            body["newName"] = newName;
+            body["newDescription"] = newDescription;
+            var response = PutRequest($"{address}groups/group/", name, body);
+            return response;
+        }
+
         public List<Group> GetAllGroups()
         {
             var groupsResponse = GetRequest($"{address}groups/");
@@ -65,12 +74,12 @@ namespace SocialNetwork.Api
 
         public Group Convert(GroupModel groupModel)
         {
-            return new Group { Name = groupModel.Name };
+            return new Group { Name = groupModel.Name, Description = groupModel.Description };
         }
 
         public GroupModel Convert(Group group)
         {
-            return new GroupModel { Name = group.Name };
+            return new GroupModel { Name = group.Name, Description = group.Description };
         }
     }
 
