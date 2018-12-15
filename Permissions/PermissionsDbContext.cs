@@ -25,8 +25,11 @@ namespace Permissions
         {
             if (Permissions.Count() == 0)
             {
-                Permissions.Add(new Permission { SubjectType = Subject.User, SubjectId = 1, ObjectType = Entities.Object.Group, ObjectId = 1, Operation = Operation.Read});
-                Permissions.Add(new Permission { SubjectType = Subject.User, SubjectId = 1, ObjectType = Entities.Object.Group, ObjectId = 1, Operation = Operation.Write });
+                Permissions.Add(new Permission { SubjectType = Subject.User, SubjectId = 1, ObjectType = Entities.Object.Group, ObjectId = 1, Operation = Operation.Admin });
+                Permissions.Add(new Permission { SubjectType = Subject.User, SubjectId = 2, ObjectType = Entities.Object.Group, ObjectId = 1, Operation = Operation.Read });
+                Permissions.Add(new Permission { SubjectType = Subject.User, SubjectId = 2, ObjectType = Entities.Object.Group, ObjectId = 2, Operation = Operation.Admin });
+                Permissions.Add(new Permission { SubjectType = Subject.User, SubjectId = 1, ObjectType = Entities.Object.Group, ObjectId = 2, Operation = Operation.Read });
+                Permissions.Add(new Permission { SubjectType = Subject.User, SubjectId = 3, ObjectType = Entities.Object.Group, ObjectId = 3, Operation = Operation.Admin });
                 SaveChanges();
             }
         }
