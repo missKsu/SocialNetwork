@@ -1,7 +1,7 @@
 ﻿@model SocialNetwork.Models.Posts.AllPostsModel
 
 <div width="10%" style="float:left">
-    <a class="btn btn-success glyphicon glyphicon-plus" asp-action="NewPost"></a>
+    <a class="btn btn-success glyphicon glyphicon-plus" asp-action="NewPost" asp-route-group="@Model.Posts.First().Group"></a>
 </div>
 <div style="float:left">
     <table class="table">
