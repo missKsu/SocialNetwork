@@ -1,0 +1,15 @@
+﻿@model SocialNetwork.Models.Posts.PostModel
+
+<form method="post" asp-action="AddPostByIf">
+    <p>
+        <label class="control-label">Your name:</label>
+        <input name="Author" class="form-control" type="text" required />
+    </p>
+    <p>
+        <label class="control-label">Message:</label>
+        <input name="Text" class="form-control" type="text" required />
+    </p>
+    <input name="Group" style="visibility:collapse" value="@Model.Group" />
+    <input type="submit" asp-action="AddPostByIf">
+
+</form>
