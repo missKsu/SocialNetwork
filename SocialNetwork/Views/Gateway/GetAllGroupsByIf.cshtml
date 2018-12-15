@@ -10,11 +10,11 @@
         <tr>
             <td width="20%">@groupModel.Name</td>
             <td width="20%">@groupModel.Creator</td>
-            <td width="50%">@groupModel.Description</td>
+            <td width="45%">@groupModel.Description</td>
             <td>
-                <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditGroup"></a>
-                <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeleteGroup"></a>
-                <a class="btn btn-danger glyphicon glyphicon-list btn-xs" asp-action="AllGroupPosts"></a>
+                <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditGroupIf" asp-route-name="@groupModel.Name"></a>
+                <a class="btn btn-danger glyphicon glyphicon-remove btn-xs"  asp-action="DeleteGroupIf" asp-route-name="@groupModel.Name"></a>
+                <a class="btn btn-danger glyphicon glyphicon-list btn-xs" asp-action="PartOfPosts" asp-route-name="@groupModel.Name" asp-route-page="0"></a>
             </td>
         </tr>
         }
