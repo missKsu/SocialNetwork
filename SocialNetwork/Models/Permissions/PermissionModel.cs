@@ -10,7 +10,7 @@ namespace SocialNetwork.Models.Permissions
         public string SubjectType { get; set; }
         public string SubjectName { get; set; }
         public string ObjectType { get; set; }
-        public int ObjectId { get; set; }
+        public string ObjectName { get; set; }
         public string Operation { get; set; }
     }
 }
