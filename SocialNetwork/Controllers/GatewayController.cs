@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Groups.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Permissions.Entities;
 using SocialNetwork.Api;
+using SocialNetwork.Models;
 using SocialNetwork.Models.Groups;
+using SocialNetwork.Models.Permissions;
 using SocialNetwork.Models.Posts;
 using SocialNetwork.Pagination;
 
@@ -18,12 +21,14 @@ namespace SocialNetwork.Controllers
         private readonly UsersApi usersApi;
         private readonly GroupsApi groupsApi;
         private readonly PostsApi postsApi;
+        private readonly PermissionsApi permissionsApi;
 
-        public GatewayController(UsersApi usersApi, GroupsApi groupsApi, PostsApi postsApi)
+        public GatewayController(UsersApi usersApi, GroupsApi groupsApi, PostsApi postsApi, PermissionsApi permissionsApi)
         {
             this.usersApi = usersApi;
             this.groupsApi = groupsApi;
             this.postsApi = postsApi;
+            this.permissionsApi = permissionsApi;
         }
 
         [HttpGet("groups/{name}")]
@@ -143,6 +148,28 @@ namespace SocialNetwork.Controllers
             return View();
         }
 
+        [HttpGet("newpost/{group}")]
+        public ActionResult NewPost(string group)
+        {
+            return View(new PostModel { Group = group});
+        }
+
+        [HttpPost("addpostbyif")]
+        public ActionResult<GroupModel> AddPostByIf(PostModel postModel)
+        {
+            var creator = usersApi.FindIdUserByName(postModel.Author);
+            var group = groupsApi.FindGroupByName(postModel.Group);
+            if (creator == -1)
+                return RedirectToAction(nameof(MessagePage), new { message = "No such user!" });
+            var permission = permissionsApi.GetPermissionForUserByGroup(creator, group.Id);
+            if (permission == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "Have no information about permission for this group!" });
+            if (permission.Operation != Operation.Admin || permission.Operation != Operation.Write)
+                return RedirectToAction(nameof(MessagePage), new { message = "Haven't admin permission!" });
+            //var result = AddGroup(groupModel);
+            return RedirectToAction(nameof(GetAllGroupsByIf));
+        }
+
         [HttpPost("addbyif")]
         public ActionResult<GroupModel> AddGroupByIf(GroupModel groupModel)
         {
@@ -160,8 +187,23 @@ namespace SocialNetwork.Controllers
         [HttpPost("deletebyif")]
         public ActionResult<GroupModel> DeleteGroupByIf(DeleteGroupModel groupModel)
         {
+            var creator = usersApi.FindIdUserByName(groupModel.Creator);
+            var group = groupsApi.FindGroupByName(groupModel.GroupName);
+            if (creator == -1)
+                return RedirectToAction(nameof(MessagePage), new { message = "No such user!" });
+            var permission = permissionsApi.GetPermissionForUserByGroup(creator, group.Id);
+            if (permission == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "No information about permission for this group!" });
+            if (permission.Operation != Operation.Admin)
+                return RedirectToAction(nameof(MessagePage), new { message = "No admin permission!" });
             var result = groupsApi.DeleteGroup(groupModel.GroupName);
             return RedirectToAction(nameof(GetAllGroupsByIf));
+        }
+
+        [HttpGet("message/{message}")]
+        public ActionResult MessagePage(string message)
+        {
+            return View("MessagePage",message);
         }
 
         [HttpGet("edit")]
@@ -175,6 +217,12 @@ namespace SocialNetwork.Controllers
         [HttpPost("editbyif")]
         public ActionResult<GroupModel> EditGroupByIf(EditGroupModel groupModel)
         {
+            var group = groupsApi.FindGroupByName(groupModel.Name);
+            var permission = permissionsApi.GetPermissionForUserByGroup(groupModel.Creator, group.Id);
+            if (permission == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "No information about permission for this group!" });
+            if (permission.Operation != Operation.Admin)
+                return RedirectToAction(nameof(MessagePage), new { message = "No permission!" });
             var result = groupsApi.EditGroup(groupModel.Name, groupModel.NewName, groupModel.NewDescription);
             return RedirectToAction(nameof(GetAllGroupsByIf));
         }
@@ -182,7 +230,7 @@ namespace SocialNetwork.Controllers
         [HttpGet("posts")]
         public ActionResult<AllPostsModel> PartOfPosts(string name, int page)
         {
-            var result = GetPostsByGroup(name,page+1,1);
+            var result = GetPostsByGroup(name,page+1,10);
             var posts = new AllPostsModel { Posts = result.Value.Content, page = result.Value.Page };
             return View(posts);
         }
