@@ -42,6 +42,8 @@ namespace SocialNetwork.Api
         public int FindIdUserByName(string name)
         {
             var user = FindUser(name);
+            if (user == null)
+                return -1;
             return user.Id;
         }
 
