@@ -51,10 +51,7 @@ namespace SocialNetwork.Api
 
         public HttpResponseMessage EditGroup(string name, string newName, string newDescription)
         {
-            var body = new Dictionary<string, string>();
-            body["newName"] = newName;
-            body["newDescription"] = newDescription;
-            var response = PutRequest($"{address}groups/group/", name, body);
+            var response = PutRequest($"{address}groups/group/",name, new Group { Name = newName, Description = newDescription});
             return response;
         }
 
