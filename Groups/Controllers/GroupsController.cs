@@ -58,30 +58,31 @@ namespace Groups.Controllers
         }
 
         [HttpPut("group/{name}")]
-        public ActionResult UpdateGroup(string name, [FromBody]string newName, [FromBody]string newDescription)
+        public ActionResult UpdateGroup(string name, [FromBody]Group group)
         {
-            var isExist = dbContext.Groups.FirstOrDefault(g => g.Name == newName);
+            var isExist = dbContext.Groups.FirstOrDefault(g => g.Name == group.Name);
             if (isExist == null)
             {
-                var group = dbContext.Groups.FirstOrDefault(g => g.Name == name);
-                if (group == null)
+                var group_old = dbContext.Groups.FirstOrDefault(g => g.Name == name);
+                if (group_old == null)
                 {
                     return StatusCode(400);
                 }
                 bool isChanged = false;
-                if (newName != "")
+                if (group.Name != "")
                 {
-                    group.Name = newName;
+                    group_old.Name = group.Name;
                     isChanged = true;
                 }
-                if (newDescription != "")
+                if (group.Description != "")
                 {
-                    group.Name = newDescription;
+                    group_old.Description = group.Description;
                     isChanged = true;
                 }
                 if (isChanged)
                 {
-                    dbContext.Groups.Update(group);
+                    dbContext.Groups.Update(group_old);
+                    dbContext.SaveChanges();
                     return StatusCode(200);
                 }
                 else
