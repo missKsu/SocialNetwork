@@ -30,15 +30,11 @@ namespace SocialNetwork.Api
             }
         }
 
-        protected HttpResponseMessage PutRequest(string address, object extadd, IDictionary<string,string> obj)
+        protected HttpResponseMessage PutRequest(string address, object extadd, object obj)
         {
             using (var client = new HttpClient())
             {
                 return client.PutAsJsonAsync(address+extadd.ToString(), obj).Result;
-                //return client.PutAsync(address + extadd.ToString(),
-                    //httpContent).Result;
-                    //new FormUrlEncodedContent(obj)).Result;
-                    //new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
             }
         }
 
