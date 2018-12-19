@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Groups.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Permissions.Entities;
+using Posts.Entities;
 using SocialNetwork.Api;
 using SocialNetwork.Models;
 using SocialNetwork.Models.Groups;
@@ -59,7 +60,7 @@ namespace SocialNetwork.Controllers
         public ActionResult<GroupModel> AddGroup(GroupModel group)
         {
             var creator = usersApi.FindIdUserByName(group.Creator);
-            if(creator == 0)
+            if(creator == -1)
             {
                 return null;
             }
@@ -67,6 +68,20 @@ namespace SocialNetwork.Controllers
             body.Creator = creator;
             var response = groupsApi.AddGroup(body);
             return group;
+        }
+
+        [HttpPost("posts")]
+        public ActionResult<PostModel> AddPost(PostModel post)
+        {
+            var creator = usersApi.FindIdUserByName(post.Author);
+            if (creator == -1)
+            {
+                return null;
+            }
+            var body = postsApi.Convert(post);
+            body.Author = creator;
+            var response = postsApi.AddPost(body);
+            return post;
         }
 
         [HttpGet("groups")]
@@ -121,7 +136,7 @@ namespace SocialNetwork.Controllers
             foreach (var post in result.Item1)
             {
                 var author = usersApi.FindUsersById(post.Author);
-                posts.Add(new PostModel { Author = author.Name, Text = post.Text, Group = group });
+                posts.Add(new PostModel { Author = author.Name, Text = post.Text, Group = group, Id = post.Id });
             }
             return new PaginatedList<PostModel>(posts, perpage, page, result.Item2);
         }
@@ -157,17 +172,18 @@ namespace SocialNetwork.Controllers
         [HttpPost("addpostbyif")]
         public ActionResult<GroupModel> AddPostByIf(PostModel postModel)
         {
-            var creator = usersApi.FindIdUserByName(postModel.Author);
+            var author = usersApi.FindIdUserByName(postModel.Author);
             var group = groupsApi.FindGroupByName(postModel.Group);
-            if (creator == -1)
+            if (author == -1)
                 return RedirectToAction(nameof(MessagePage), new { message = "No such user!" });
-            var permission = permissionsApi.GetPermissionForUserByGroup(creator, group.Id);
+            var permission = permissionsApi.GetPermissionForUserByGroup(author, group.Id);
             if (permission == null)
                 return RedirectToAction(nameof(MessagePage), new { message = "Have no information about permission for this group!" });
-            if (permission.Operation != Operation.Admin || permission.Operation != Operation.Write)
-                return RedirectToAction(nameof(MessagePage), new { message = "Haven't admin permission!" });
-            //var result = AddGroup(groupModel);
-            return RedirectToAction(nameof(GetAllGroupsByIf));
+            if (permission.Operation != Operation.Admin && permission.Operation != Operation.Write)
+                return RedirectToAction(nameof(MessagePage), new { message = "Haven't  permission!" });
+            var body = new Post {Author = author, Group = group.Id, Text = postModel.Text };
+            var result = postsApi.AddPost(body);
+            return RedirectToAction(nameof(PartOfPosts),new { name = group.Name, page = 0});
         }
 
         [HttpPost("addbyif")]
@@ -231,8 +247,61 @@ namespace SocialNetwork.Controllers
         public ActionResult<AllPostsModel> PartOfPosts(string name, int page)
         {
             var result = GetPostsByGroup(name,page+1,10);
-            var posts = new AllPostsModel { Posts = result.Value.Content, page = result.Value.Page };
+            var posts = new AllPostsModel { Posts = result.Value.Content, page = result.Value.Page, GroupName = name };
+            if (posts.Posts.Count() == 0)
+                posts.message = "No posts! You can be first.";
             return View(posts);
+        }
+
+        [HttpGet("posts/delete")]
+        public ActionResult DeletePostIf(int id, string group)
+        {
+            var post = new DeletePostModel { Id = id, Group = group };
+            return View(post);
+        }
+
+        [HttpPost("posts/deletebyif")]
+        public ActionResult<PostModel> DeletePostByIf(DeletePostModel postModel)
+        {
+            var creator = usersApi.FindIdUserByName(postModel.Creator);
+            if (creator == -1)
+                return RedirectToAction(nameof(MessagePage), new { message = "No such user!" });
+            var post = postsApi.GetPostById(postModel.Id);
+            if (post == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "No such post!" });
+            if (post.Author != creator)
+            {
+                var permission = permissionsApi.GetPermissionForUserByGroup(creator, post.Group);
+                if (permission == null)
+                    return RedirectToAction(nameof(MessagePage), new { message = "No information about permission for this group!" });
+                if (permission.Operation != Operation.Admin)
+                    return RedirectToAction(nameof(MessagePage), new { message = "No permission!" });
+            }
+            var result = postsApi.DeletePost(postModel.Id);
+            return RedirectToAction(nameof(PartOfPosts), new { name = postModel.Group, page = 0 });
+        }
+
+        [HttpGet("posts/edit")]
+        public ActionResult EditPostIf(EditPostModel postModel)
+        {
+            var post = postsApi.GetPostById(postModel.Id);
+            postModel.Text = post.Text;
+            postModel.NewText = post.Text;
+            return View(postModel);
+        }
+
+        [HttpPost("posts/editbyif")]
+        public ActionResult<PostModel> EditPostByIf(EditPostModel postModel)
+        {
+            var group = groupsApi.FindGroupByName(postModel.Group);
+            var creator = usersApi.FindIdUserByName(postModel.Creator);
+            var permission = permissionsApi.GetPermissionForUserByGroup(creator, group.Id);
+            if (permission == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "No information about permission for this group!" });
+            if (permission.Operation != Operation.Admin || creator != group.Creator)
+                return RedirectToAction(nameof(MessagePage), new { message = "No permission!" });
+            var result = postsApi.EditPost(postModel.Id, postModel.NewText);
+            return RedirectToAction(nameof(PartOfPosts), new { name = postModel.Group, page = 0 });
         }
     }
 }
