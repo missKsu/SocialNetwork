@@ -57,16 +57,41 @@ namespace Posts.Controllers
         }
 
         [HttpPut("post/{id}")]
-        public ActionResult UpdatePost(int id, string text)
+        public ActionResult UpdatePost(int id, Post change)
         {
             var post = dbContext.Posts.FirstOrDefault(p => p.Id == id);
             if (post != null)
             {
-                post.Text = text;
+                post.Text = change.Text;
                 dbContext.Posts.Update(post);
                 return StatusCode(200);
             }
             return StatusCode(400);
+        }
+
+        [HttpPost("post")]
+        public ActionResult AddPost([FromBody]Post post)
+        {
+            if (post.Author != -1 && post.Group != -1 && post.Text != "")
+            {
+                dbContext.Posts.Add(post);
+                dbContext.SaveChanges();
+                return StatusCode(200);
+            }
+            return StatusCode(404);
+        }
+
+        [HttpDelete("post/{id}")]
+        public ActionResult DeletePost(int id)
+        {
+            var post = dbContext.Posts.FirstOrDefault(p => p.Id == id);
+            if (post != null)
+            {
+                dbContext.Posts.Remove(post);
+                dbContext.SaveChanges();
+                return StatusCode(200);
+            }
+            return StatusCode(422);
         }
     }
 }
