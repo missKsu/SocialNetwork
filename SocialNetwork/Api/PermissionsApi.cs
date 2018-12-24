@@ -32,6 +32,19 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public Permission GetPermissionByFull(Permission permission)
+        {
+            var subjectId = permission.SubjectId;
+            var objectType = permission.ObjectType;
+            var objectId = permission.ObjectId;
+            var response = GetRequest($"{address}permissions/{subjectId}/{objectType}/{objectId}");
+            string jsonString = response.Content.ReadAsStringAsync().Result;
+            if (jsonString == "[]")
+                return null;
+            var per = JsonConvert.DeserializeObject<Permission>(jsonString);
+            return per;
+        }
+
         public Permission GetPermissionForUserByGroup(int subjectId, int objectId)
         {
             var response = GetRequest($"{address}permissions/user/{subjectId}/group/{objectId}");
@@ -40,5 +53,20 @@ namespace SocialNetwork.Api
             return permission;
         }
         
+        public List<Permission> GetUserPermissionsById(int id)
+        {
+            var response = GetRequest($"{address}permissions/user/{id}");
+            string jsonString = response.Content.ReadAsStringAsync().Result;
+            var permissions = JsonConvert.DeserializeObject<List<Permission>>(jsonString);
+            return permissions;
+        }
+
+        public List<Permission> GetEditablePermissionsByUserId(int id)
+        {
+            var response = GetRequest($"{address}permissions/editable/user/{id}");
+            string jsonString = response.Content.ReadAsStringAsync().Result;
+            var permissions = JsonConvert.DeserializeObject<List<Permission>>(jsonString);
+            return permissions;
+        }
     }
 }
