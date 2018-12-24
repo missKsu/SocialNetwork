@@ -1,0 +1,19 @@
+﻿<form method="post" asp-action="AddPermissionByIf" style="width:inherit">
+    <p>
+        <label class="control-label">Type of object:</label>
+        <input type="text" name="ObjectType" required />
+    </p>
+    <p>
+        <label class="control-label">Name of object:</label>
+        <input type="text" name="ObjectName" required />
+    </p>
+    <p>
+        <label class="control-label">User name:</label>
+        <input type="text" name="SubjectName" required />
+    </p>
+    <p>
+        <label class="control-label">Permission:</label>
+        <input type="text" name="Operation" required />
+    </p>
+    <input type="submit" asp-action="AddPermissionByIf">
+</form>
