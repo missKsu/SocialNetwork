@@ -16,6 +16,7 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-controller="Users" asp-action="GetAllUsersByIf">Get all users</a></li>
                     <li><a asp-controller="Gateway" asp-action="GetAllGroupsByIf">Get all groups</a></li>
+                    <li><a asp-controller="Gateway" asp-action="GetPermissionsIf">Get permissions</a></li>
                 </ul>
             </div>
         </div>
@@ -23,9 +24,9 @@
     <div class="container-fluid body-content" width="100%">
         @RenderBody()
     </div>
-    <footer>
-        <hr />
-        <p>&copy; 2018 </p>
+    <footer  style="bottom:0;position: fixed; width:100%;">
+        <hr style="height=10px;" />
+        <p> &copy;  @DateTime.Now.Year </p>
     </footer>
 </body>
 </html>
