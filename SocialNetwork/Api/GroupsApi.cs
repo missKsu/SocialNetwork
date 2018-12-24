@@ -44,8 +44,14 @@ namespace SocialNetwork.Api
         public Group AddGroup(Group group)
         {
             var response = PostRequest($"{address}groups/group", group);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            string jsonResponse = response.Content.ReadAsStringAsync().Result;
+            var id = JsonConvert.DeserializeObject<int>(jsonResponse);
+            if (id != -1)
+            {
+                group.Id = id;
                 return group;
+            }
+                
             return null;
         }
 
