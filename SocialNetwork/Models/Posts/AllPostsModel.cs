@@ -9,5 +9,7 @@ namespace SocialNetwork.Models.Posts
     {
         public List<PostModel> Posts { get; set; }
         public int page { get; set; }
+        public string message { get; set; }
+        public string GroupName { get; set; }
     }
 }
