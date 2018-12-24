@@ -7,9 +7,13 @@
     </p>
     <p>
         <label class="control-label">Message:</label>
-        <input name="Text" class="form-control" type="text" required />
+        <textarea name="Text" class="form-control" rows="10" required></textarea>
     </p>
-    <input name="Group" style="visibility:collapse" value="@Model.Group" />
-    <input type="submit" asp-action="AddPostByIf">
+    <p>
+        <input name="Group" style="visibility:collapse" value="@Model.Group" /><br />
+        <input type="submit" asp-action="AddPostByIf"><br />
+        <a class="btn btn-primary glyphicon glyphicon-arrow-left btn-xs" asp-action="PartOfPosts" asp-route-name="@Model.Group" asp-route-page="0"></a>
+    </p>
+    
 
 </form>
