@@ -67,6 +67,9 @@ namespace SocialNetwork.Controllers
             var body = groupsApi.Convert(group);
             body.Creator = creator;
             var response = groupsApi.AddGroup(body);
+            if (response == null)
+                return null;
+            var responsePermission = permissionsApi.AddPermission(new Permission { SubjectType = Subject.User, SubjectId = creator, ObjectType = Permissions.Entities.Object.Group, ObjectId = response.Id, Operation = Operation.Admin});
             return group;
         }
 
@@ -150,6 +153,21 @@ namespace SocialNetwork.Controllers
             return View(model);
         }
 
+        [HttpGet("if/permissions")]
+        public ActionResult GetPermissionsIf()
+        {
+            return View();
+        }
+
+        [HttpPost("if/permissions/user")]
+        public ActionResult GetUserPermissionsByIf(string creator)
+        {
+            var user = usersApi.FindIdUserByName(creator);
+            var resultUser = permissionsApi.GetUserPermissionsById(user);
+            var resultForUser = permissionsApi.GetEditablePermissionsByUserId(user);
+            return View(new AllPermissionsForUser { UserPermissions = Convert(resultUser), EditablePermissions = Convert(resultForUser)});
+        }
+
         [HttpPut("groups/merge/{group}")]
         public ActionResult<GroupModel> MergeOneGroupWithAnother(string group, string with)
         {
@@ -159,6 +177,12 @@ namespace SocialNetwork.Controllers
 
         [HttpGet("new")]
         public ActionResult NewGroup()
+        {
+            return View();
+        }
+
+        [HttpGet("permissions/new")]
+        public ActionResult NewPermission()
         {
             return View();
         }
@@ -190,6 +214,21 @@ namespace SocialNetwork.Controllers
         public ActionResult<GroupModel> AddGroupByIf(GroupModel groupModel)
         {
             var result = AddGroup(groupModel);
+            if (result == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "Not add!" });
+            return RedirectToAction(nameof(GetAllGroupsByIf));
+        }
+
+        [HttpPost("permissions/addbyif")]
+        public ActionResult<GroupModel> AddPermissionByIf(PermissionModel permissionModel)
+        {
+            var permission = Convert(permissionModel);
+            var check = permissionsApi.GetPermissionByFull(permission);
+            if (check == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "This user has permission!" });
+            var result = permissionsApi.AddPermission(permission);
+            if (result == null)
+                return RedirectToAction(nameof(MessagePage), new { message = "Not add!" });
             return RedirectToAction(nameof(GetAllGroupsByIf));
         }
 
@@ -302,6 +341,96 @@ namespace SocialNetwork.Controllers
                 return RedirectToAction(nameof(MessagePage), new { message = "No permission!" });
             var result = postsApi.EditPost(postModel.Id, postModel.NewText);
             return RedirectToAction(nameof(PartOfPosts), new { name = postModel.Group, page = 0 });
+        }
+
+        public List<PermissionModel> Convert(List<Permission> permissions)
+        {
+            var result = new List<PermissionModel> { };
+            foreach (Permission permission in permissions)
+            {
+                var permissionModel = new PermissionModel { };
+                switch (permission.ObjectType)
+                {
+                    case Permissions.Entities.Object.Group:
+                        var group = groupsApi.FindGroupById(permission.ObjectId);
+                        if (group == null)
+                            break;
+                        permissionModel.ObjectType = "Group";
+                        permissionModel.ObjectName = group.Name;
+                        break;
+                    case Permissions.Entities.Object.Post:
+                        permissionModel.ObjectType = "Post";
+                        break;
+                    case Permissions.Entities.Object.Permission:
+                        break;
+                    default:
+                        break;
+                }
+                switch (permission.Operation)
+                {
+                    case Operation.Write:
+                        permissionModel.Operation = "Write";
+                        break;
+                    case Operation.Read:
+                        permissionModel.Operation = "Read";
+                        break;
+                    case Operation.CantWrite:
+                        permissionModel.Operation = "Can't write";
+                        break;
+                    case Operation.CantRead:
+                        permissionModel.Operation = "Can't read";
+                        break;
+                    case Operation.Admin:
+                        permissionModel.Operation = "Admin";
+                        break;
+                }
+                permissionModel.SubjectType = "User";
+                permissionModel.SubjectName = usersApi.FindUsersById(permission.SubjectId).Name;
+                result.Add(permissionModel);
+            }
+            return result;
+        }
+
+        public Permission Convert (PermissionModel permissionModel)
+        {
+            var permission = new Permission { };
+            switch (permissionModel.ObjectType)
+            {
+                case "Group":
+                    var group = groupsApi.FindGroupByName(permissionModel.ObjectName);
+                    if (group == null)
+                        break;
+                    permission.ObjectType = Permissions.Entities.Object.Group;
+                    permission.ObjectId = group.Id;
+                    break;
+                case "Post":
+                    permission.ObjectType = Permissions.Entities.Object.Post;
+                    permission.ObjectId = Int32.Parse(permissionModel.ObjectName);
+                    break;
+                default:
+                    break;
+            }
+            permission.SubjectType = Subject.User;
+            permission.SubjectId = usersApi.FindIdUserByName(permissionModel.SubjectName);
+            switch (permissionModel.Operation)
+            {
+                case "Write":
+                    permission.Operation = Operation.Write;
+                    break;
+                case "Read":
+                    permission.Operation = Operation.Read;
+                    break;
+                case "Can't write":
+                    permission.Operation = Operation.CantWrite;
+                    break;
+                case "Can't read":
+                    permission.Operation = Operation.CantRead;
+                    break;
+                case "Admin":
+                    permission.Operation = Operation.Admin;
+                    break;
+            }
+            return permission;
         }
     }
 }
