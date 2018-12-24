@@ -58,7 +58,7 @@ namespace SocialNetwork.Api
 
         public HttpResponseMessage EditPost(int id, string newText)
         {
-            var response = PutRequest($"{address}posts/post/", id, new Post { Text = newText });
+            var response = PutRequest($"{address}posts/post/", id, newText);
             return response;
         }
 
