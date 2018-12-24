@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Groups.Entities;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Posts.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,11 +32,30 @@ namespace SocialNetwork.Api
             }
         }
 
-        protected HttpResponseMessage PutRequest(string address, object extadd, object obj)
+        protected HttpResponseMessage PutRequest(string address, object extadd, Group obj)
         {
             using (var client = new HttpClient())
             {
-                return client.PutAsJsonAsync(address+extadd.ToString(), obj).Result;
+                //return client.PutAsync(address + extadd.ToString(), new StringContent(JsonConvert.SerializeObject(obj), UnicodeEncoding.UTF8, "application/json")).Result;
+                return client.PutAsJsonAsync<Group>(address+extadd.ToString(), obj).Result;
+            }
+        }
+
+        protected HttpResponseMessage PutRequest(string address, object extadd, Post obj)
+        {
+            using (var client = new HttpClient())
+            {
+                //return client.PutAsync(address + extadd.ToString(), new StringContent(JsonConvert.SerializeObject(obj), UnicodeEncoding.UTF8, "application/json")).Result;
+                return client.PutAsJsonAsync<Post>(address + extadd.ToString(), obj).Result;
+            }
+        }
+
+        protected HttpResponseMessage PutRequest(string address, object extadd, string obj)
+        {
+            using (var client = new HttpClient())
+            {
+                //return client.PutAsync(address + extadd.ToString(), new StringContent(JsonConvert.SerializeObject(obj), UnicodeEncoding.UTF8, "application/json")).Result;
+                return client.PutAsJsonAsync<string>(address + extadd.ToString(), obj).Result;
             }
         }
 
