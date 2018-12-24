@@ -26,11 +26,35 @@ namespace Permissions.Controllers
             return result.Select(s => new Permission { Id = s.Id, SubjectType = s.SubjectType, SubjectId = s.SubjectId, ObjectType = s.ObjectType, ObjectId = s.ObjectId, Operation = s.Operation }).ToList();
         }
 
+        [HttpGet("editable/user/{id}")]
+        public ActionResult<List<Permission>> GetEditablePermissionsByUserId(int id)
+        {
+            var response = dbContext.Permissions.Where(p => p.SubjectId == id && p.Operation == Operation.Admin);
+            var result = response.Select(s => new Permission { ObjectType = s.ObjectType, ObjectId = s.ObjectId}).ToList();
+            var editablePermissions = new List<Permission> { };
+            foreach (var permission in result)
+            {
+                var responsePermission = dbContext.Permissions.Where(p => p.ObjectType == permission.ObjectType && p.ObjectId == permission.ObjectId).ToList();
+                foreach (var resPermission in responsePermission)
+                {
+                    editablePermissions.Add(resPermission);
+                }
+            }
+            return editablePermissions;
+        }
+
         [HttpGet("{objectType}/{id}/{operation}")]
         public ActionResult<List<Permission>> GetUserPermissionsByObjectAndOperation(Entities.Object objectType ,int id, Operation operation)
         {
             var result = dbContext.Permissions.Where(p => p.ObjectType == objectType && p.ObjectId == id && p.Operation == operation);
             return result.Select(s => new Permission { Id = s.Id, SubjectType = s.SubjectType, SubjectId = s.SubjectId, ObjectType = s.ObjectType, ObjectId = s.ObjectId, Operation = s.Operation }).ToList();
+        }
+
+        [HttpGet("/{subjectId}/{objectType}/{id}")]
+        public ActionResult<Permission> GetPermissionsByFull(Entities.Object objectType,int subjectId, int id, Entities.Object objectype)
+        {
+            var result = dbContext.Permissions.FirstOrDefault(p => p.ObjectType == objectType && p.ObjectId == id && p.SubjectId == subjectId);
+            return result;
         }
 
         [HttpGet("user/{subjectId}/group/{objectId}")]
