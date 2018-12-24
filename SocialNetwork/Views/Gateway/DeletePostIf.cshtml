@@ -1,0 +1,14 @@
+﻿@model SocialNetwork.Models.Posts.DeletePostModel
+
+<form asp-controller="Gateway"
+      method="post">
+    <h2>Are you sure you want to delete this post?</h2>
+    <p>Your name: <input type="text" name="Creator"></p>
+    <input name="Id" style="visibility:collapse" value="@Model.Id" />
+    <input name="Group" style="visibility:collapse" value="@Model.Group" />
+    <p>
+        <input type="submit" class="btn btn-success" asp-action="DeletePostByIf" value="Yes" />
+        <a asp-action="PartOfPosts" asp-route-name="@Model.Group" asp-route-page="0" class="btn btn-danger">No</a>
+        <a></a>
+    </p>
+</form>

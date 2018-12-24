@@ -42,6 +42,8 @@ namespace SocialNetwork.Api
         public int FindIdUserByName(string name)
         {
             var user = FindUser(name);
+            if (user == null)
+                return -1;
             return user.Id;
         }
 
@@ -71,18 +73,27 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public HttpResponseMessage DeleteUser(string name)
+        {
+            var response = DeleteRequest($"{address}users/user/", name);
+            return response;
+        }
+
+        public UserModel EditUser(string name, UserModel userModel)
+        {
+            var newName = userModel.Name;
+            var response = PutRequest($"{address}users/user/",name, newName);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                return userModel;
+            return null;
+        }
+
         public AllUsersModel GetAllUsers()
         {
             var usersResponse = GetRequest($"{address}users/");
             string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
             var users = JsonConvert.DeserializeObject<List<User>>(jsonString);
             return Convert(users);
-        }
-
-        public HttpResponseMessage DeleteUser(string name)
-        {
-            var userResponse = DeleteRequest($"{address}users/user/",name);
-            return userResponse;
         }
 
         private User Convert(UserModel userModel)

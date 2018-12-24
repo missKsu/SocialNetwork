@@ -146,7 +146,7 @@ namespace Groups.Test.Controllers
             Group group = CreateGroup(1, "Group", 1, "element1");
             var controller = CreateControllerWithGroups(group);
 
-            var result = controller.UpdateGroup("Group", "MainGroup", "");
+            var result = controller.UpdateGroup("Group", new Group { Name="MainGroup", Description="" });
 
             var code = result as StatusCodeResult;
             code.Should().NotBeNull();
@@ -159,7 +159,7 @@ namespace Groups.Test.Controllers
             Group group = CreateGroup(1, "Group", 1, "element1");
             var controller = CreateControllerWithGroups(group);
 
-            var result = controller.UpdateGroup("Group", "", "element2");
+            var result = controller.UpdateGroup("Group", new Group { Name = "", Description = "element2" });
 
             var code = result as StatusCodeResult;
             code.Should().NotBeNull();
@@ -172,7 +172,7 @@ namespace Groups.Test.Controllers
             Group group = CreateGroup(1, "Group", 1, "element1");
             var controller = CreateControllerWithGroups(group);
 
-            var result = controller.UpdateGroup("Group", "", "");
+            var result = controller.UpdateGroup("Group", new Group { Name = "", Description = "" });
 
             var code = result as StatusCodeResult;
             code.Should().NotBeNull();
@@ -184,7 +184,7 @@ namespace Groups.Test.Controllers
         {
             var controller = CreateControllerWithGroups();
 
-            var result = controller.UpdateGroup("Group", "Name", "element");
+            var result = controller.UpdateGroup("Group", new Group { Name = "Name", Description = "element" });
 
             var code = result as StatusCodeResult;
             code.Should().NotBeNull();

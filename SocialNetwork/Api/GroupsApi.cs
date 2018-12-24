@@ -44,9 +44,21 @@ namespace SocialNetwork.Api
         public Group AddGroup(Group group)
         {
             var response = PostRequest($"{address}groups/group", group);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            string jsonResponse = response.Content.ReadAsStringAsync().Result;
+            var id = JsonConvert.DeserializeObject<int>(jsonResponse);
+            if (id != -1)
+            {
+                group.Id = id;
                 return group;
+            }
+                
             return null;
+        }
+
+        public HttpResponseMessage EditGroup(string name, string newName, string newDescription)
+        {
+            var response = PutRequest($"{address}groups/group/",name, new Group { Name = newName, Description = newDescription});
+            return response;
         }
 
         public List<Group> GetAllGroups()
@@ -65,14 +77,13 @@ namespace SocialNetwork.Api
 
         public Group Convert(GroupModel groupModel)
         {
-            return new Group { Name = groupModel.Name };
+            return new Group { Name = groupModel.Name, Description = groupModel.Description };
         }
 
         public GroupModel Convert(Group group)
         {
-            return new GroupModel { Name = group.Name };
+            return new GroupModel { Name = group.Name, Description = group.Description };
         }
-
     }
 
  }

@@ -32,15 +32,15 @@ namespace Groups.Controllers
         }
 
         [HttpPost("group")]
-        public ActionResult AddGroup([FromBody]Group group)
+        public int AddGroup([FromBody]Group group)
         {
             if(group.Name != "" && group.Creator != 0)
             {
                 dbContext.Groups.Add(group);
                 dbContext.SaveChanges();
-                return StatusCode(200);
+                return dbContext.Groups.FirstOrDefault(g => g.Creator == group.Creator && g.Name == group.Name).Id;
             }
-            return StatusCode(404);
+            return -1;
         }
 
         [HttpGet("description/{word}")]
@@ -58,36 +58,43 @@ namespace Groups.Controllers
         }
 
         [HttpPut("group/{name}")]
-        public ActionResult UpdateGroup(string name, string newName, string newDescription)
+        public ActionResult UpdateGroup(string name, [FromBody]Group group)
         {
-            var isExist = dbContext.Groups.FirstOrDefault(g => g.Name == newName);
+            var isExist = dbContext.Groups.FirstOrDefault(g => g.Name == group.Name);
             if (isExist == null)
             {
-                var group = dbContext.Groups.FirstOrDefault(g => g.Name == name);
-                if (group == null)
+                var group_old = dbContext.Groups.FirstOrDefault(g => g.Name == name);
+                if (group_old == null)
                 {
                     return StatusCode(400);
                 }
                 bool isChanged = false;
-                if (newName != "")
+                if (group.Name != "")
                 {
-                    group.Name = newName;
+                    group_old.Name = group.Name;
                     isChanged = true;
                 }
-                if (newDescription != "")
+                if (group.Description != "")
                 {
-                    group.Name = newDescription;
+                    group_old.Description = group.Description;
                     isChanged = true;
                 }
                 if (isChanged)
                 {
-                    dbContext.Groups.Update(group);
+                    dbContext.Groups.Update(group_old);
+                    dbContext.SaveChanges();
                     return StatusCode(200);
                 }
                 else
                     return StatusCode(422);
             }
             return StatusCode(400);
+        }
+
+        [HttpGet()]
+        public ActionResult<List<Group>> GetAllGroups()
+        {
+            return dbContext.Groups.ToList();
         }
 
         [HttpDelete("group/{name}")]
@@ -101,12 +108,6 @@ namespace Groups.Controllers
                 return StatusCode(200);
             }
             return StatusCode(422);
-        }
-
-        [HttpGet()]
-        public ActionResult<List<Group>> GetAllGroups()
-        {
-            return dbContext.Groups.ToList();
         }
     }
 }

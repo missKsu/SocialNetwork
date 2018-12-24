@@ -1,0 +1,22 @@
+﻿@model SocialNetwork.Models.Users.AllUsersModel
+
+<div width="10%" style="float:left">
+    <a class="btn btn-success glyphicon glyphicon-plus" asp-action="NewUser"></a>
+</div>
+<div style="float:left">
+    <table class="table">
+        @foreach (var userModel in Model.Users)
+        {
+            <tr>
+                <td width="90%">@userModel.Name</td>
+                <td>
+                    <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditUserIf" asp-route-name=@userModel.Name></a>
+                    <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeleteUserIf" asp-route-name=@userModel.Name></a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+
+
