@@ -32,15 +32,15 @@ namespace Groups.Controllers
         }
 
         [HttpPost("group")]
-        public ActionResult AddGroup([FromBody]Group group)
+        public int AddGroup([FromBody]Group group)
         {
             if(group.Name != "" && group.Creator != 0)
             {
                 dbContext.Groups.Add(group);
                 dbContext.SaveChanges();
-                return StatusCode(200);
+                return dbContext.Groups.FirstOrDefault(g => g.Creator == group.Creator && g.Name == group.Name).Id;
             }
-            return StatusCode(404);
+            return -1;
         }
 
         [HttpGet("description/{word}")]
