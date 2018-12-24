@@ -1,0 +1,40 @@
+﻿@model SocialNetwork.Models.Permissions.AllPermissionsForUser
+
+
+<div style="float:left; width:30%; clear:left; display:inline-block">
+    <label class="control-label">Your permissions</label>
+    <table class="table">
+        @foreach (var permissionModel in Model.UserPermissions)
+        {
+            <tr>
+                <td width="10%">@permissionModel.ObjectType</td>
+                <td width="10%">@permissionModel.ObjectName</td>
+                <td width="20%">@permissionModel.Operation</td>
+            </tr>
+        }
+    </table>
+</div>
+<div style="float:left; width:40px; clear: right; text-align:center; display:inline-block">
+    <br/><a class="btn btn-success glyphicon glyphicon-plus btn-xs" asp-action="NewPermission"></a>
+</div>
+<div style="float:left; width:60%; clear:right; display:inline-block">
+    <label class="control-label">Permissions, that you can modify</label><br/>
+    
+    <div style="float:left;">
+        <table class="table">
+        @foreach (var permissionModel in Model.EditablePermissions)
+        {
+            <tr>
+                <td width="10%">@permissionModel.ObjectType</td>
+                <td width="10%">@permissionModel.ObjectName</td>
+                <td width="10%">@permissionModel.SubjectName</td>
+                <td width="30%">@permissionModel.Operation</td>
+            </tr>
+        }
+    </table>
+    </div>
+    
+</div>
+
+
+
