@@ -1,24 +1,25 @@
 ﻿@model SocialNetwork.Models.Posts.AllPostsModel
 
-<div width="10%" style="float:left">
-    <a class="btn btn-success glyphicon glyphicon-plus" asp-action="NewPost" asp-route-group="@Model.Posts.First().Group"></a>
+<div width="15%" style="float:left">
+    <a class="btn btn-success glyphicon glyphicon-plus" asp-action="NewPost" asp-route-group="@Model.GroupName"></a>
 </div>
 <div style="float:left">
+    <h1>@Model.message</h1>
     <table class="table">
         @foreach (var postModel in Model.Posts)
         {
             <tr>
-                <td width="30%">@postModel.Author</td>
+                <td width="25%">@postModel.Author</td>
                 <td width="60%">@postModel.Text</td>
                 <td>
-                    <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditGroupIf"></a>
-                    <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeleteGroupIf"></a>
+                    <a class="btn btn-primary glyphicon glyphicon-pencil btn-xs" asp-action="EditPostIf"  asp-route-id="@postModel.Id" asp-route-group="@postModel.Group"></a>
+                    <a class="btn btn-danger glyphicon glyphicon-remove btn-xs" asp-action="DeletePostIf" asp-route-id="@postModel.Id" asp-route-group="@postModel.Group"></a>
                 </td>
             </tr>
         }
     </table>
     <p>Page: @Model.page</p>
-    <a asp-action="PartOfPosts" asp-route-name="@Model.Posts.First().Group" asp-route-page="@Model.page" class="btn btn-primary">Next page</a>
+    <a asp-action="PartOfPosts" asp-route-name="@Model.GroupName" asp-route-page="@Model.page" class="btn btn-primary">Next page</a>
 </div>
 
 
