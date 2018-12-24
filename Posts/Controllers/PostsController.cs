@@ -57,12 +57,12 @@ namespace Posts.Controllers
         }
 
         [HttpPut("post/{id}")]
-        public ActionResult UpdatePost(int id, Post change)
+        public ActionResult UpdatePost(int id, string newText)
         {
             var post = dbContext.Posts.FirstOrDefault(p => p.Id == id);
             if (post != null)
             {
-                post.Text = change.Text;
+                post.Text = newText;
                 dbContext.Posts.Update(post);
                 return StatusCode(200);
             }
