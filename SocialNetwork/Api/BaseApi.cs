@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Posts.Entities;
+using SocialNetwork.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,22 @@ namespace SocialNetwork.Api
 {
     public class BaseApi
     {
+        protected bool Authorized = false;
+        protected string token;
+
+        protected string Authorize(string address, string login, string pass)
+        {
+            var data = new Models.Auth { Login = login, Pass = pass };
+            var response = PostRequest($"{address}/auth", data);
+            string token = response.Content.ReadAsStringAsync().Result;
+            return token;
+        }
+
         protected HttpResponseMessage PostRequest(string address, object obj)
         {
             using (var client = new HttpClient())
             {
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 return client.PostAsync(address,
                     new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
             }
@@ -28,6 +41,7 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 return client.GetAsync(address).Result;
             }
         }
@@ -36,7 +50,7 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                //return client.PutAsync(address + extadd.ToString(), new StringContent(JsonConvert.SerializeObject(obj), UnicodeEncoding.UTF8, "application/json")).Result;
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 return client.PutAsJsonAsync<Group>(address+extadd.ToString(), obj).Result;
             }
         }
@@ -45,7 +59,7 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                //return client.PutAsync(address + extadd.ToString(), new StringContent(JsonConvert.SerializeObject(obj), UnicodeEncoding.UTF8, "application/json")).Result;
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 return client.PutAsJsonAsync<Post>(address + extadd.ToString(), obj).Result;
             }
         }
@@ -54,7 +68,7 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                //return client.PutAsync(address + extadd.ToString(), new StringContent(JsonConvert.SerializeObject(obj), UnicodeEncoding.UTF8, "application/json")).Result;
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 return client.PutAsJsonAsync<string>(address + extadd.ToString(), obj).Result;
             }
         }
@@ -63,6 +77,7 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 return client.DeleteAsync(address + extadd.ToString()).Result;
             }
         }

@@ -13,10 +13,24 @@ namespace Groups.Controllers
     public class GroupsController : Controller
     {
         private readonly GroupsDbContext dbContext;
+        private readonly TokensStorage tokensStorage;
 
-        public GroupsController(GroupsDbContext dbContext)
+        public GroupsController(GroupsDbContext dbContext, TokensStorage tokensStorage)
         {
             this.dbContext = dbContext;
+            this.tokensStorage = tokensStorage;
+        }
+
+        [HttpPost("auth")]
+        public string Auth([FromBody]Auth auth)
+        {
+            if (auth.Login == GroupsCredenntials.Login && auth.Pass == GroupsCredenntials.Password)
+            {
+                var token = Guid.NewGuid().ToString();
+                tokensStorage.AddToken(token);
+                return token;
+            }
+            return null;
         }
 
         [HttpGet("group/{name}")]
@@ -28,6 +42,16 @@ namespace Groups.Controllers
         [HttpGet("id/{id}")]
         public ActionResult<Group> FindGroupById(int id)
         {
+
+            if (!HttpContext.Request.Headers.ContainsKey("Authorization")){
+                
+            }
+            var token = HttpContext.Request.Headers["Authorization"].ToString();
+            token = token.Substring(token.IndexOf(' ') + 1);
+            if (!tokensStorage.CheckToken(token))
+            {
+                return StatusCode(403);
+            }
             return dbContext.Groups.FirstOrDefault(g => g.Id == id);
         }
 

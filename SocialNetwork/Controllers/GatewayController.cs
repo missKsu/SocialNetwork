@@ -23,13 +23,15 @@ namespace SocialNetwork.Controllers
         private readonly GroupsApi groupsApi;
         private readonly PostsApi postsApi;
         private readonly PermissionsApi permissionsApi;
+        private readonly Groups.TokensStorage groupsTokensStorage;
 
-        public GatewayController(UsersApi usersApi, GroupsApi groupsApi, PostsApi postsApi, PermissionsApi permissionsApi)
+        public GatewayController(UsersApi usersApi, GroupsApi groupsApi, PostsApi postsApi, PermissionsApi permissionsApi, Groups.TokensStorage groupsTokensStorage)
         {
             this.usersApi = usersApi;
             this.groupsApi = groupsApi;
             this.postsApi = postsApi;
             this.permissionsApi = permissionsApi;
+            this.groupsTokensStorage = groupsTokensStorage;
         }
 
         [HttpGet("groups/{name}")]

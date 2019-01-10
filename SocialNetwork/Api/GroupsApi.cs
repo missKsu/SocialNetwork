@@ -1,4 +1,5 @@
-﻿using Groups.Entities;
+﻿using Groups;
+using Groups.Entities;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SocialNetwork.Models.Groups;
@@ -35,6 +36,11 @@ namespace SocialNetwork.Api
 
         public virtual Group FindGroupById(int id)
         {
+            if (!Authorized)
+            {
+                token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
+                Authorized = true;
+            }
             var groupResponse = GetRequest($"{address}groups/id/{id}");
             string jsonResponse = groupResponse.Content.ReadAsStringAsync().Result;
             var group = JsonConvert.DeserializeObject<Group>(jsonResponse);
@@ -43,6 +49,11 @@ namespace SocialNetwork.Api
 
         public Group AddGroup(Group group)
         {
+            if (!Authorized)
+            {
+                var token = Authorize($"{address}groups", "asd", "qwe");
+                Authorized = true;
+            }
             var response = PostRequest($"{address}groups/group", group);
             string jsonResponse = response.Content.ReadAsStringAsync().Result;
             var id = JsonConvert.DeserializeObject<int>(jsonResponse);

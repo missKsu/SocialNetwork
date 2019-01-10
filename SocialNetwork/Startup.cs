@@ -26,10 +26,11 @@ namespace SocialNetwork
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<UsersApi>();
-            services.AddTransient<GroupsApi>();
-            services.AddTransient<PostsApi>();
-            services.AddTransient<PermissionsApi>();
+            services.AddSingleton<UsersApi>();
+            services.AddSingleton<GroupsApi>();
+            services.AddSingleton<PostsApi>();
+            services.AddSingleton<PermissionsApi>();
+            services.AddSingleton<Groups.TokensStorage>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
