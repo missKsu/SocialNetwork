@@ -25,7 +25,7 @@ namespace Users
         {
             if (Users.Count() == 0)
             {
-                Users.Add(new User { Name = "TestUser1" });
+                Users.Add(new User { Name = "TESTUSER1", Password = "TESTUSER" });
                 Users.Add(new User { Name = "TestUser2" });
                 SaveChanges();
             }

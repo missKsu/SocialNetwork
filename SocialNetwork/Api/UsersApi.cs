@@ -65,6 +65,14 @@ namespace SocialNetwork.Api
             return null;
         }
 
+        public UserModel AddUser(User user)
+        {
+            var response = PostRequest($"{address}users", Convert(user));
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                return Convert(user);
+            return null;
+        }
+
         public UserModel EditUser(string name, string newName)
         {
             var response = PutRequest($"{address}users/user/", name, newName);
@@ -98,12 +106,12 @@ namespace SocialNetwork.Api
 
         private User Convert(UserModel userModel)
         {
-            return new User { Name = userModel.Name };
+            return new User { Name = userModel.Name, Password = userModel.Password };
         }
 
         private UserModel Convert(User user)
         {
-            return new UserModel { Name = user.Name };
+            return new UserModel { Name = user.Name, Password = user.Password };
         }
 
         private AllUsersModel Convert(List<User> users)

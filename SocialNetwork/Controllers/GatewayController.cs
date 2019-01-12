@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Groups.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Permissions.Entities;
 using Posts.Entities;
@@ -50,6 +51,7 @@ namespace SocialNetwork.Controllers
             return new GroupModel { Name = group.Name, Creator = userName.Name, Description = group.Description };
         }
 
+        [Authorize]
         [HttpGet("groups/id/{id}")]
         public ActionResult<GroupModel> FindGroupById(int id)
         {
