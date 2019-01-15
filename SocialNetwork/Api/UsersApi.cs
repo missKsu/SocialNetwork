@@ -36,6 +36,8 @@ namespace SocialNetwork.Api
         public UserModel FindUsersByName(string name)
         {
             var user = FindUser(name);
+            if (user is null)
+                return null;
             return Convert(user);
         }
 

@@ -51,7 +51,6 @@ namespace SocialNetwork.Controllers
             return new GroupModel { Name = group.Name, Creator = userName.Name, Description = group.Description };
         }
 
-        [Authorize]
         [HttpGet("groups/id/{id}")]
         public ActionResult<GroupModel> FindGroupById(int id)
         {
@@ -148,6 +147,7 @@ namespace SocialNetwork.Controllers
             return new PaginatedList<PostModel>(posts, perpage, page, result.Item2);
         }
 
+        [Authorize]
         [HttpGet("if/groups")]
         public ActionResult GetAllGroupsByIf()
         {
@@ -157,12 +157,14 @@ namespace SocialNetwork.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpGet("if/permissions")]
         public ActionResult GetPermissionsIf()
         {
             return View();
         }
 
+        [Authorize]
         [HttpPost("if/permissions/user")]
         public ActionResult GetUserPermissionsByIf(string creator)
         {
@@ -179,24 +181,28 @@ namespace SocialNetwork.Controllers
             return null;
         }
 
+        [Authorize]
         [HttpGet("new")]
         public ActionResult NewGroup()
         {
             return View();
         }
 
+        [Authorize]
         [HttpGet("permissions/new")]
         public ActionResult NewPermission()
         {
             return View();
         }
 
+        [Authorize]
         [HttpGet("newpost/{group}")]
         public ActionResult NewPost(string group)
         {
             return View(new PostModel { Group = group});
         }
 
+        [Authorize]
         [HttpPost("addpostbyif")]
         public ActionResult<GroupModel> AddPostByIf(PostModel postModel)
         {
@@ -214,6 +220,7 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(PartOfPosts),new { name = group.Name, page = 0});
         }
 
+        [Authorize]
         [HttpPost("addbyif")]
         public ActionResult<GroupModel> AddGroupByIf(GroupModel groupModel)
         {
@@ -223,6 +230,7 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(GetAllGroupsByIf));
         }
 
+        [Authorize]
         [HttpPost("permissions/addbyif")]
         public ActionResult<GroupModel> AddPermissionByIf(PermissionModel permissionModel)
         {
@@ -236,6 +244,7 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(GetAllGroupsByIf));
         }
 
+        [Authorize]
         [HttpGet("delete")]
         public ActionResult DeleteGroupIf(string name)
         {

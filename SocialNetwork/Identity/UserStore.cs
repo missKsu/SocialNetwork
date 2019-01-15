@@ -5,6 +5,7 @@ using SocialNetwork.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace SocialNetwork.Identity
 
         public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
         {
-            var result = usersApi.AddUser(new Models.Users.UserModel { Name = user.UserName });
+            var result = usersApi.AddUser(new Models.Users.UserModel { Name = user.UserName, Password = user.PasswordHash });
             if (result != null)
                 return IdentityResult.Success;
             return IdentityResult.Failed();
@@ -34,28 +35,34 @@ namespace SocialNetwork.Identity
         {
         }
 
-        public Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var result = usersApi.FindUsersById(Convert.ToInt32(userId));
+            if (result != null)
+                return CreateUserFromModel(result);
+            return null;
         }
 
         public async Task<User> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             var result = usersApi.FindUsersByName(normalizedUserName);
             if (result != null)
-                return new User { UserName = result.Name };
+                return CreateUserFromModel(result);
             return null;
+        }
+
+        private static User CreateUserFromModel(Models.Users.UserModel result)
+        {
+            return new User { UserName = result.Name, PasswordHash = result.Password, SecurityStamp = result.Password };
         }
 
         public async Task<string> GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return user.NormalizedUserName;
         }
 
         public async Task<string> GetPasswordHashAsync(User user, CancellationToken cancellationToken)
         {
-            if (hash != null)
-                return hash;
             return user.PasswordHash;
         }
 
@@ -75,7 +82,9 @@ namespace SocialNetwork.Identity
 
         public async Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken)
         {
-            return true;
+            if (user.PasswordHash != null)
+                return true;
+            return false;
         }
 
         public async Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
@@ -83,12 +92,11 @@ namespace SocialNetwork.Identity
             user.NormalizedUserName = normalizedName;
         }
 
-        private string hash;
         private readonly UsersApi usersApi;
 
         public async Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken cancellationToken)
         {
-            hash = passwordHash;
+            user.PasswordHash = passwordHash;
         }
         
         public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)

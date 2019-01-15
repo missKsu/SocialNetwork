@@ -36,6 +36,7 @@ namespace SocialNetwork.Controllers
                 var result = signInManager.PasswordSignInAsync(model.Name, model.Password, false , false).Result;
                 if (result.Succeeded)
                 {
+                    return View();
                     return StatusCode(200);
                 }
             }
@@ -53,11 +54,11 @@ namespace SocialNetwork.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = model.Name };
-                var result = userManager.CreateAsync(new User { UserName = model.Name}, model.Password);
-                if (result.IsCompletedSuccessfully)
+                var user = new User { UserName = model.Name, Id = Guid.NewGuid().ToString() };
+                var result = userManager.CreateAsync(user, model.Password).Result;
+                if (result.Succeeded)
                 {
-                    return StatusCode(200);
+                    Login(model);
                 }
             }
             return StatusCode(403);

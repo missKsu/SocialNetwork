@@ -29,7 +29,7 @@ namespace Users.Controllers
         [HttpGet("name/{name}")]
         public ActionResult<User> GetUserByName(string name)
         {
-            return dbContext.Users.SingleOrDefault(u => u.Name == name);
+            return dbContext.Users.SingleOrDefault(u => u.Name.ToUpperInvariant() == name.ToUpperInvariant());
         }
 
         [HttpGet()]
@@ -41,7 +41,7 @@ namespace Users.Controllers
         [HttpPost]
         public ActionResult AddUser([FromBody]User user)
         {
-            if (user.Name != "" && user.Name != null)
+            if (user.Name != "" && user.Name != null && user.Password != "")
             {
                 dbContext.Users.Add(user);
                 dbContext.SaveChanges();
