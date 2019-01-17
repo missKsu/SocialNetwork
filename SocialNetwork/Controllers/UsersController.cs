@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Api;
 using SocialNetwork.Models.Users;
@@ -31,7 +32,6 @@ namespace SocialNetwork.Controllers
         [HttpPost]
         public ActionResult<UserModel> AddUser(UserModel userModel)
         {
-            //return RedirectToAction(nameof(GetAllUsers));
             return usersApi.AddUser(userModel);
         }
 
@@ -56,6 +56,7 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(GetAllUsersByIf));
         }
 
+        [Authorize]
         [HttpGet("all")]
         public ActionResult GetAllUsersByIf()
         {
@@ -64,6 +65,7 @@ namespace SocialNetwork.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpGet("new")]
         public ActionResult NewUser()
         {

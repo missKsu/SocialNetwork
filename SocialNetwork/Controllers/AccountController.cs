@@ -33,13 +33,14 @@ namespace SocialNetwork.Controllers
             if (ModelState.IsValid)
             {
                 //userManager.AddPasswordAsync(new Identity.User { UserName = model.Name }, model.Password);
-                var result = signInManager.PasswordSignInAsync(model.Name, model.Password, false , false).Result;
+                var result = signInManager.PasswordSignInAsync(model.Name, model.Password, true , false).Result;
                 if (result.Succeeded)
                 {
-                    return View();
+                    return RedirectToAction("GetAllUsersByIf", "Users"); //View();
                     return StatusCode(200);
                 }
             }
+            return RedirectToAction("MessagePage","Gateway", new { message = "No such user!" });
             return StatusCode(403);
         }
 
@@ -58,7 +59,7 @@ namespace SocialNetwork.Controllers
                 var result = userManager.CreateAsync(user, model.Password).Result;
                 if (result.Succeeded)
                 {
-                    Login(model);
+                    return Login(model);
                 }
             }
             return StatusCode(403);

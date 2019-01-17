@@ -24,15 +24,13 @@ namespace SocialNetwork.Controllers
         private readonly GroupsApi groupsApi;
         private readonly PostsApi postsApi;
         private readonly PermissionsApi permissionsApi;
-        private readonly Groups.TokensStorage groupsTokensStorage;
 
-        public GatewayController(UsersApi usersApi, GroupsApi groupsApi, PostsApi postsApi, PermissionsApi permissionsApi, Groups.TokensStorage groupsTokensStorage)
+        public GatewayController(UsersApi usersApi, GroupsApi groupsApi, PostsApi postsApi, PermissionsApi permissionsApi)
         {
             this.usersApi = usersApi;
             this.groupsApi = groupsApi;
             this.postsApi = postsApi;
             this.permissionsApi = permissionsApi;
-            this.groupsTokensStorage = groupsTokensStorage;
         }
 
         [HttpGet("groups/{name}")]
@@ -55,7 +53,15 @@ namespace SocialNetwork.Controllers
         public ActionResult<GroupModel> FindGroupById(int id)
         {
             var group = groupsApi.FindGroupById(id);
+            if (group == null)
+            {
+                return StatusCode(404);
+            }
             var userName = usersApi.FindUsersById(group.Creator);
+            if (userName == null)
+            {
+                return StatusCode(404);
+            }
             return new GroupModel { Name = group.Name, Creator = userName.Name, Description = group.Description };
         }
 
@@ -165,9 +171,10 @@ namespace SocialNetwork.Controllers
         }
 
         [Authorize]
-        [HttpPost("if/permissions/user")]
+        [HttpGet("if/permissions/user")]
         public ActionResult GetUserPermissionsByIf(string creator)
         {
+            creator = User.Identities.First(i => i.IsAuthenticated).Name;
             var user = usersApi.FindIdUserByName(creator);
             var resultUser = permissionsApi.GetUserPermissionsById(user);
             var resultForUser = permissionsApi.GetEditablePermissionsByUserId(user);
@@ -252,6 +259,7 @@ namespace SocialNetwork.Controllers
             return View(group);
         }
 
+        [Authorize]
         [HttpPost("deletebyif")]
         public ActionResult<GroupModel> DeleteGroupByIf(DeleteGroupModel groupModel)
         {
@@ -268,12 +276,14 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(GetAllGroupsByIf));
         }
 
+        [Authorize]
         [HttpGet("message/{message}")]
         public ActionResult MessagePage(string message)
         {
             return View("MessagePage",message);
         }
 
+        [Authorize]
         [HttpGet("edit")]
         public ActionResult EditGroupIf(string name)
         {
@@ -282,6 +292,7 @@ namespace SocialNetwork.Controllers
             return View(modifiedGroup);
         }
 
+        [Authorize]
         [HttpPost("editbyif")]
         public ActionResult<GroupModel> EditGroupByIf(EditGroupModel groupModel)
         {
@@ -295,6 +306,7 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(GetAllGroupsByIf));
         }
 
+        [Authorize]
         [HttpGet("posts")]
         public ActionResult<AllPostsModel> PartOfPosts(string name, int page)
         {
@@ -305,6 +317,7 @@ namespace SocialNetwork.Controllers
             return View(posts);
         }
 
+        [Authorize]
         [HttpGet("posts/delete")]
         public ActionResult DeletePostIf(int id, string group)
         {
@@ -333,6 +346,7 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(PartOfPosts), new { name = postModel.Group, page = 0 });
         }
 
+        [Authorize]
         [HttpGet("posts/edit")]
         public ActionResult EditPostIf(EditPostModel postModel)
         {

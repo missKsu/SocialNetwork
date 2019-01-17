@@ -28,7 +28,15 @@ namespace SocialNetwork.Api
 
         public virtual Group FindGroupByName(string name)
         {
+            CheckAuthorization();
             var groupResponse = GetRequest($"{address}groups/group/{name}");
+            if (groupResponse.StatusCode != System.Net.HttpStatusCode.OK && groupResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (groupResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
+                groupResponse = GetRequest($"{address}groups/group/{name}");
+            }
             string jsonResponse = groupResponse.Content.ReadAsStringAsync().Result;
             var group = JsonConvert.DeserializeObject<Group>(jsonResponse);
             return group;
@@ -36,12 +44,15 @@ namespace SocialNetwork.Api
 
         public virtual Group FindGroupById(int id)
         {
-            if (!Authorized)
+            CheckAuthorization();
+            var groupResponse = GetRequest($"{address}groups/id/{id}");
+            if (groupResponse.StatusCode != System.Net.HttpStatusCode.OK && groupResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (groupResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
-                Authorized = true;
+                groupResponse = GetRequest($"{address}groups/id/{id}");
             }
-            var groupResponse = GetRequest($"{address}groups/id/{id}");
             string jsonResponse = groupResponse.Content.ReadAsStringAsync().Result;
             var group = JsonConvert.DeserializeObject<Group>(jsonResponse);
             return group;
@@ -49,12 +60,15 @@ namespace SocialNetwork.Api
 
         public Group AddGroup(Group group)
         {
-            if (!Authorized)
-            {
-                var token = Authorize($"{address}groups", "asd", "qwe");
-                Authorized = true;
-            }
+            CheckAuthorization();
             var response = PostRequest($"{address}groups/group", group);
+            if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
+                response = PostRequest($"{address}groups/group", group);
+            }
             string jsonResponse = response.Content.ReadAsStringAsync().Result;
             var id = JsonConvert.DeserializeObject<int>(jsonResponse);
             if (id != -1)
@@ -68,13 +82,29 @@ namespace SocialNetwork.Api
 
         public HttpResponseMessage EditGroup(string name, string newName, string newDescription)
         {
+            CheckAuthorization();
             var response = PutRequest($"{address}groups/group/",name, new Group { Name = newName, Description = newDescription});
+            if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
+                response = PutRequest($"{address}groups/group/", name, new Group { Name = newName, Description = newDescription });
+            }
             return response;
         }
 
         public List<Group> GetAllGroups()
         {
+            CheckAuthorization();
             var groupsResponse = GetRequest($"{address}groups/");
+            if (groupsResponse.StatusCode != System.Net.HttpStatusCode.OK && groupResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (groupsResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
+                groupsResponse = GetRequest($"{address}groups/");
+            }
             string jsonString = groupsResponse.Content.ReadAsStringAsync().Result;
             var groups = JsonConvert.DeserializeObject<List<Group>>(jsonString);
             return groups;
@@ -82,7 +112,15 @@ namespace SocialNetwork.Api
 
         public HttpResponseMessage DeleteGroup(string name)
         {
+            CheckAuthorization();
             var groupResponse = DeleteRequest($"{address}groups/group/", name);
+            if (groupResponse.StatusCode != System.Net.HttpStatusCode.OK && groupResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (groupResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
+                groupResponse = DeleteRequest($"{address}groups/group/", name);
+            }
             return groupResponse;
         }
 
@@ -94,6 +132,15 @@ namespace SocialNetwork.Api
         public GroupModel Convert(Group group)
         {
             return new GroupModel { Name = group.Name, Description = group.Description };
+        }
+
+        private void CheckAuthorization()
+        {
+            if (!Authorized)
+            {
+                token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
+                Authorized = true;
+            }
         }
     }
 

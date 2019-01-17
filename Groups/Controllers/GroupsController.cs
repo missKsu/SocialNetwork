@@ -33,32 +33,52 @@ namespace Groups.Controllers
             return null;
         }
 
+        public ActionResult<bool> CheckToken(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        {
+            if (!httpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                return StatusCode(400);
+            }
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            token = token.Substring(token.IndexOf(' ') + 1);
+            var check = tokensStorage.CheckToken(token);
+            if (check == AuthorizeResult.NoToken || check == AuthorizeResult.WrongToken)
+            {
+                return StatusCode(403);
+            }
+            if (check == AuthorizeResult.TokenExpired)
+                return StatusCode(401);
+            return true;
+        }
+
         [HttpGet("group/{name}")]
         public ActionResult<Group> FindGroupByName(string name)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             return dbContext.Groups.FirstOrDefault(g => g.Name == name);
         }
 
         [HttpGet("id/{id}")]
         public ActionResult<Group> FindGroupById(int id)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
 
-            if (!HttpContext.Request.Headers.ContainsKey("Authorization")){
-                
-            }
-            var token = HttpContext.Request.Headers["Authorization"].ToString();
-            token = token.Substring(token.IndexOf(' ') + 1);
-            if (!tokensStorage.CheckToken(token))
-            {
-                return StatusCode(403);
-            }
             return dbContext.Groups.FirstOrDefault(g => g.Id == id);
         }
 
         [HttpPost("group")]
-        public int AddGroup([FromBody]Group group)
+        public ActionResult<int> AddGroup([FromBody]Group group)
         {
-            if(group.Name != "" && group.Creator != 0)
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
+            if (group.Name != "" && group.Creator != 0)
             {
                 dbContext.Groups.Add(group);
                 dbContext.SaveChanges();
@@ -70,6 +90,10 @@ namespace Groups.Controllers
         [HttpGet("description/{word}")]
         public ActionResult<List<Group>> FindGroupsByDescription(string word)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var result = dbContext.Groups.Where(g => g.Description == word);
             return result.Select(s => new Group { Id = s.Id, Name = s.Name, Creator = s.Creator, Description = s.Description }).ToList();
         }
@@ -77,6 +101,10 @@ namespace Groups.Controllers
         [HttpGet("creator/{creator}")]
         public ActionResult<List<Group>> FindGroupsByCreator(int creator)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var result = dbContext.Groups.Where(g => g.Creator == creator);
             return result.Select(s => new Group { Id = s.Id, Name = s.Name, Creator = s.Creator, Description = s.Description }).ToList();
         }
@@ -84,6 +112,10 @@ namespace Groups.Controllers
         [HttpPut("group/{name}")]
         public ActionResult UpdateGroup(string name, [FromBody]Group group)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var isExist = dbContext.Groups.FirstOrDefault(g => g.Name == group.Name);
             if (isExist == null)
             {
@@ -118,12 +150,20 @@ namespace Groups.Controllers
         [HttpGet()]
         public ActionResult<List<Group>> GetAllGroups()
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             return dbContext.Groups.ToList();
         }
 
         [HttpDelete("group/{name}")]
         public ActionResult DeleteGroup(string name)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var group = dbContext.Groups.FirstOrDefault(g => g.Name == name);
             if (group != null)
             {

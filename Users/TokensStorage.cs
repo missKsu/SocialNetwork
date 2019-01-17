@@ -1,10 +1,10 @@
-﻿using Groups.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Users.Entities;
 
-namespace Groups
+namespace Users
 {
     public class TokensStorage
     {
