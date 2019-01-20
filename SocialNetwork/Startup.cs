@@ -42,7 +42,7 @@ namespace SocialNetwork
             services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = "CookieName";
-                options.ExpireTimeSpan = TimeSpan.FromSeconds(10);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
             });
         }
 

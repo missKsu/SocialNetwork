@@ -98,7 +98,7 @@ namespace SocialNetwork.Api
         {
             CheckAuthorization();
             var groupsResponse = GetRequest($"{address}groups/");
-            if (groupsResponse.StatusCode != System.Net.HttpStatusCode.OK && groupResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+            if (groupsResponse.StatusCode != System.Net.HttpStatusCode.OK && groupsResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (groupsResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {

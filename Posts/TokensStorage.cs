@@ -24,7 +24,7 @@ namespace Posts
             if (result == null)
                 return AuthorizeResult.WrongToken;
             var date = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMinutes;
-            if (result.Item2 + 30 > date)
+            if (result.Item2 + 30 < date)
                 return AuthorizeResult.TokenExpired;
             return AuthorizeResult.Succeed;
         }

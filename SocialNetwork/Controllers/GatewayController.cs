@@ -373,6 +373,8 @@ namespace SocialNetwork.Controllers
         public List<PermissionModel> Convert(List<Permission> permissions)
         {
             var result = new List<PermissionModel> { };
+            if (permissions is null)
+                return result;
             foreach (Permission permission in permissions)
             {
                 var permissionModel = new PermissionModel { };

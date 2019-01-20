@@ -6,10 +6,6 @@
               method="post">
             <div class="form-group">
                 <p>
-                    <label class="control-label">Your name:</label>
-                    <input name="User" class="form-control" type="text" required />
-                </p>
-                <p>
                     <label class="control-label">Name:</label>
                     <input name="NewName" class="form-control" type="text" required value=@Model.NewName />
                 </p>
@@ -21,6 +17,7 @@
                 <input name="Name" style="visibility:collapse" value="@Model.Description" />
                 <input name="Creator" style="visibility:collapse" value="@Model.Creator" />
             </div>
+            <input name="User" style="visibility:collapse" value="@User.Identities.First(i => i.IsAuthenticated).Name" /><br />
             <input type="submit" class="btn btn-primary" asp-action="EditGroupByIf" value="Change" />
         </form>
     </div>

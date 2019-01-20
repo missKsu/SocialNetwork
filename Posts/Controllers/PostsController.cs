@@ -62,7 +62,7 @@ namespace Posts.Controllers
         }
 
         [HttpGet("author/{author}")]
-        public (List<Post>,int) FindPostsByAuthor(int author, int page, int perpage)
+        public ActionResult<(List<Post>,int)> FindPostsByAuthor(int author, int page, int perpage)
         {
             var res = CheckToken(HttpContext);
             if (!res.Value)
@@ -81,7 +81,7 @@ namespace Posts.Controllers
         }
 
         [HttpGet("group/{group}")]
-        public (List<Post>, int) FindPostsByGroup(int group, int page, int perpage)
+        public ActionResult<(List<Post>, int)> FindPostsByGroup(int group, int page, int perpage)
         {
             var res = CheckToken(HttpContext);
             if (!res.Value)
