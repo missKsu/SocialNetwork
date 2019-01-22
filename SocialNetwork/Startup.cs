@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,11 +29,25 @@ namespace SocialNetwork
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<TokensStorage>();
             services.AddSingleton<UsersApi>();
             services.AddSingleton<GroupsApi>();
             services.AddSingleton<PostsApi>();
             services.AddSingleton<PermissionsApi>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddMvcCore()
+                .AddAuthorization()
+                .AddJsonFormatters();
+
+            services.AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "http://localhost:5010";
+                    options.RequireHttpsMetadata = false;
+
+                    options.ApiName = "api1";
+                });
 
             services.AddIdentity<User, Role>()
                 .AddUserStore<UserStore>()

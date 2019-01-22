@@ -21,7 +21,6 @@ namespace AuthorizationServer
             /*WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();*/
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls("http://localhost:8000")
                 .UseStartup<Startup>();
     }
 }

@@ -1,21 +1,21 @@
-﻿using IdentityServer4.Models;
-using System;
+﻿using IdentityServer4;
+using IdentityServer4.Models;
+using IdentityServer4.Test;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AuthorizationServer
 {
     public class Config
     {
+        private const int Expiration = 600;
+
         // scopes define the API resources in your system
         public static IEnumerable<ApiResource> GetApiResources()
         {
             return new List<ApiResource>
             {
-                new ApiResource("scope.readaccess", "Example API"),
-                new ApiResource("scope.fullaccess", "Example API"),
-                new ApiResource("YouCanActuallyDefineTheScopesAsYouLike", "Example API")
+                new ApiResource("api", "API")
             };
         }
 
@@ -24,27 +24,44 @@ namespace AuthorizationServer
         {
             return new List<Client>
             {
-                new Client
+                                new Client
                 {
-                    ClientId = "ClientIdThatCanOnlyRead",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-
-                    ClientSecrets =
+                    ClientId = "test-client",
+                    ClientName = "Test client",
+                    AllowedGrantTypes = GrantTypes.Code.Concat(GrantTypes.ResourceOwnerPassword).ToList(),
+                    AllowAccessTokensViaBrowser = true,
+                    AllowOfflineAccess = true,
+                    RequireConsent = true,
+                    RedirectUris = { "http://localhost:5000/account/oauth/code" },
+                    EnableLocalLogin = true,
+                    AccessTokenLifetime = Expiration,
+                    IdentityTokenLifetime = Expiration,
+                    AuthorizationCodeLifetime = Expiration,
+                    AllowedScopes =
                     {
-                        new Secret("secret1".Sha256())
+                        IdentityServerConstants.StandardScopes.OfflineAccess,
+                        "api"
                     },
-                    AllowedScopes = { "scope.readaccess" }
+                    ClientSecrets = new List<Secret>() { new Secret("test-secret".Sha256()) }
+                }
+            };
+        }
+
+        public static List<TestUser> GetUsers()
+        {
+            return new List<TestUser>
+            {
+                new TestUser
+                {
+                    SubjectId = "1",
+                    Username = "User1",
+                    Password = "pass1"
                 },
-                new Client
+                new TestUser
                 {
-                    ClientId = "ClientIdWithFullAccess",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-
-                    ClientSecrets =
-                    {
-                        new Secret("secret2".Sha256())
-                    },
-                    AllowedScopes = { "scope.fullaccess" }
+                    SubjectId = "2",
+                    Username = "User2",
+                    Password = "pass2"
                 }
             };
         }
