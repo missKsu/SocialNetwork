@@ -3,8 +3,8 @@
 <form asp-controller="Gateway"
       method="post">
     <h2>Are you sure you want to delete group @Model.GroupName?</h2>
-    <p>Your name: <input type="text" name="Creator"></p>
     <input name="GroupName" style="visibility:collapse" value="@Model.GroupName" />
+    <input name="Creator" style="visibility:collapse" value="@User.Identities.First(i => i.IsAuthenticated).Name" /><br />
     <p>
         <input type="submit" class="btn btn-success" asp-action="DeleteGroupByIf" value="Yes" />
         <a asp-action="GetAllGroupsByIf" class="btn btn-danger">No</a>

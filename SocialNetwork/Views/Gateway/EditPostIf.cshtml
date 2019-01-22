@@ -6,16 +6,13 @@
               method="post">
             <div class="form-group">
                 <p>
-                    <label class="control-label">Your name:</label>
-                    <input name="Creator" class="form-control" type="text" required />
-                </p>
-                <p>
                     <label class="control-label">Text:</label>
                     <textarea name="NewText" class="form-control" rows="10" required> @Model.Text </textarea>
                 </p>
                 <input name="Id" style="visibility:collapse" value="@Model.Id" />
                 <input name="Group" style="visibility:collapse" value="@Model.Group" />
             </div>
+            <input name="Creator" style="visibility:collapse" value="@User.Identities.First(i => i.IsAuthenticated).Name" /><br />
             <input type="submit" class="btn btn-primary" asp-action="EditPostByIf" value="Change" />
             <a class="btn btn-primary glyphicon glyphicon-arrow-left btn-xs" asp-action="PartOfPosts" asp-route-name="@Model.Group" asp-route-page="0"></a>
         </form>

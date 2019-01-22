@@ -2,15 +2,12 @@
 
 <form method="post" asp-action="AddPostByIf">
     <p>
-        <label class="control-label">Your name:</label>
-        <input name="Author" class="form-control" type="text" required />
-    </p>
-    <p>
         <label class="control-label">Message:</label>
         <textarea name="Text" class="form-control" rows="10" required></textarea>
     </p>
     <p>
         <input name="Group" style="visibility:collapse" value="@Model.Group" /><br />
+        <input name="Author" style="visibility:collapse" value="@User.Identities.First(i => i.IsAuthenticated).Name" /><br />
         <input type="submit" asp-action="AddPostByIf"><br />
         <a class="btn btn-primary glyphicon glyphicon-arrow-left btn-xs" asp-action="PartOfPosts" asp-route-name="@Model.Group" asp-route-page="0"></a>
     </p>

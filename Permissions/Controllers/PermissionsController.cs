@@ -13,15 +13,52 @@ namespace Permissions.Controllers
     public class PermissionsController : Controller
     {
         private readonly PermissionsDbContext dbContext;
+        private readonly TokensStorage tokensStorage;
 
-        public PermissionsController(PermissionsDbContext dbContext)
+        public PermissionsController(PermissionsDbContext dbContext, TokensStorage tokensStorage)
         {
             this.dbContext = dbContext;
+            this.tokensStorage = tokensStorage;
         }
+
+        [HttpPost("auth")]
+        public string Auth([FromBody]Auth auth)
+        {
+            if (auth.Login == PermissionsCredentials.Login && auth.Pass == PermissionsCredentials.Password)
+            {
+                var token = Guid.NewGuid().ToString();
+                tokensStorage.AddToken(token);
+                return token;
+            }
+            return null;
+        }
+
+        public ActionResult<bool> CheckToken(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        {
+            if (!httpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                return StatusCode(400);
+            }
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            token = token.Substring(token.IndexOf(' ') + 1);
+            var check = tokensStorage.CheckToken(token);
+            if (check == AuthorizeResult.NoToken || check == AuthorizeResult.WrongToken)
+            {
+                return StatusCode(403);
+            }
+            if (check == AuthorizeResult.TokenExpired)
+                return StatusCode(401);
+            return true;
+        }
+
 
         [HttpGet("user/{id}")]
         public ActionResult<List<Permission>> GetUserPermissionsById(int id)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var result = dbContext.Permissions.Where(p => p.SubjectId == id);
             return result.Select(s => new Permission { Id = s.Id, SubjectType = s.SubjectType, SubjectId = s.SubjectId, ObjectType = s.ObjectType, ObjectId = s.ObjectId, Operation = s.Operation }).ToList();
         }
@@ -29,6 +66,10 @@ namespace Permissions.Controllers
         [HttpGet("editable/user/{id}")]
         public ActionResult<List<Permission>> GetEditablePermissionsByUserId(int id)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var response = dbContext.Permissions.Where(p => p.SubjectId == id && p.Operation == Operation.Admin);
             var result = response.Select(s => new Permission { ObjectType = s.ObjectType, ObjectId = s.ObjectId}).ToList();
             var editablePermissions = new List<Permission> { };
@@ -46,6 +87,10 @@ namespace Permissions.Controllers
         [HttpGet("{objectType}/{id}/{operation}")]
         public ActionResult<List<Permission>> GetUserPermissionsByObjectAndOperation(Entities.Object objectType ,int id, Operation operation)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var result = dbContext.Permissions.Where(p => p.ObjectType == objectType && p.ObjectId == id && p.Operation == operation);
             return result.Select(s => new Permission { Id = s.Id, SubjectType = s.SubjectType, SubjectId = s.SubjectId, ObjectType = s.ObjectType, ObjectId = s.ObjectId, Operation = s.Operation }).ToList();
         }
@@ -53,6 +98,10 @@ namespace Permissions.Controllers
         [HttpGet("/{subjectId}/{objectType}/{id}")]
         public ActionResult<Permission> GetPermissionsByFull(Entities.Object objectType,int subjectId, int id, Entities.Object objectype)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var result = dbContext.Permissions.FirstOrDefault(p => p.ObjectType == objectType && p.ObjectId == id && p.SubjectId == subjectId);
             return result;
         }
@@ -60,6 +109,10 @@ namespace Permissions.Controllers
         [HttpGet("user/{subjectId}/group/{objectId}")]
         public ActionResult<Permission> GetUserPermissionsForUserByGroup(int subjectId, int objectId)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var result = dbContext.Permissions.FirstOrDefault(p => p.ObjectType == Entities.Object.Group && p.ObjectId == objectId && p.SubjectId == subjectId && p.SubjectType == Subject.User);
             return result;
         }
@@ -67,6 +120,10 @@ namespace Permissions.Controllers
         [HttpPost]
         public ActionResult AddPermission([FromBody]Permission permission)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             if (permission.ObjectId != 0 && permission.SubjectId != 0)
             {
                 dbContext.Permissions.Add(permission);

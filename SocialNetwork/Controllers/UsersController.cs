@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Api;
 using SocialNetwork.Models.Users;
@@ -16,22 +17,45 @@ namespace SocialNetwork.Controllers
     public class UsersController : Controller
     {
         private readonly UsersApi usersApi;
+        private readonly TokensStorage tokensStorage;
 
-        public UsersController(UsersApi usersApi)
+        public UsersController(UsersApi usersApi, TokensStorage tokensStorage)
         {
             this.usersApi = usersApi;
+            this.tokensStorage = tokensStorage;
+        }
+
+        public ActionResult<bool> CheckToken(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        {
+            if (!httpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                return StatusCode(403,"Without authorization in headers you can't get response");
+            }
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            token = token.Substring(token.IndexOf(' ') + 1);
+            var check = tokensStorage.CheckToken(token);
+            if (check == SocialNetwork.Identity.AuthorizeResult.NoToken || check == SocialNetwork.Identity.AuthorizeResult.WrongToken)
+            {
+                return StatusCode(403, "Without authorization you can't get response");
+            }
+            if (check == SocialNetwork.Identity.AuthorizeResult.TokenExpired)
+                return RedirectToAction("OAuthReLogin", "Accounts", new { token });
+            return true;
         }
 
         [HttpGet("name/{name}")]
         public ActionResult<UserModel> FindUsersByModel(string name)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             return usersApi.FindUsersByName(name);
         }
 
         [HttpPost]
         public ActionResult<UserModel> AddUser(UserModel userModel)
         {
-            //return RedirectToAction(nameof(GetAllUsers));
             return usersApi.AddUser(userModel);
         }
 
@@ -56,6 +80,7 @@ namespace SocialNetwork.Controllers
             return RedirectToAction(nameof(GetAllUsersByIf));
         }
 
+        [Authorize]
         [HttpGet("all")]
         public ActionResult GetAllUsersByIf()
         {
@@ -64,6 +89,7 @@ namespace SocialNetwork.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpGet("new")]
         public ActionResult NewUser()
         {

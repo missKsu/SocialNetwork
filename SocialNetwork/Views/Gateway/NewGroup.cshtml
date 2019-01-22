@@ -4,12 +4,9 @@
         <input type="text" name="Name" required />
     </p>
     <p>
-        <label class="control-label">Creator:</label>
-        <input type="text" name="Creator" required />
-    </p>
-    <p>
         <label class="control-label">Description:</label>
         <input type="text" name="Description" required />
     </p>
+    <input name="Creator" style="visibility:collapse" value="@User.Identities.First(i => i.IsAuthenticated).Name" /><br />
     <input type="submit" asp-action="AddGroupByIf">
 </form>

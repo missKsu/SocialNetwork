@@ -13,35 +13,82 @@ namespace Users.Controllers
     public class UsersController : Controller
     {
         private readonly UsersDbContext dbContext;
+        private readonly TokensStorage tokensStorage;
 
-        public UsersController(UsersDbContext dbContext)
+        public UsersController(UsersDbContext dbContext, TokensStorage tokensStorage)
         {
             this.dbContext = dbContext;
+            this.tokensStorage = tokensStorage;
+        }
+
+        [HttpPost("auth")]
+        public string Auth([FromBody]Auth auth)
+        {
+            if (auth.Login == UsersCredenntials.Login && auth.Pass == UsersCredenntials.Password)
+            {
+                var token = Guid.NewGuid().ToString();
+                tokensStorage.AddToken(token);
+                return token;
+            }
+            return null;
+        }
+
+        public ActionResult<bool> CheckToken(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        {
+            if (!httpContext.Request.Headers.ContainsKey("Authorization"))
+            {
+                return StatusCode(400);
+            }
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            token = token.Substring(token.IndexOf(' ') + 1);
+            var check = tokensStorage.CheckToken(token);
+            if (check == AuthorizeResult.NoToken || check == AuthorizeResult.WrongToken)
+            {
+                return StatusCode(403);
+            }
+            if (check == AuthorizeResult.TokenExpired)
+                return StatusCode(401);
+            return true;
         }
 
         [HttpGet("id/{id}")]
         public ActionResult<User> GetUserById(int id)
         {
-            //LINQ
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             return dbContext.Users.FirstOrDefault(u => u.Id == id);
         }
 
         [HttpGet("name/{name}")]
         public ActionResult<User> GetUserByName(string name)
         {
-            return dbContext.Users.SingleOrDefault(u => u.Name == name);
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
+            return dbContext.Users.SingleOrDefault(u => u.Name.ToUpperInvariant() == name.ToUpperInvariant());
         }
 
         [HttpGet()]
         public ActionResult<List<User>> GetAllUsers()
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             return dbContext.Users.ToList();
         }
 
         [HttpPost]
         public ActionResult AddUser([FromBody]User user)
         {
-            if (user.Name != "" && user.Name != null)
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
+            if (user.Name != "" && user.Name != null && user.Password != "")
             {
                 dbContext.Users.Add(user);
                 dbContext.SaveChanges();
@@ -56,6 +103,10 @@ namespace Users.Controllers
         [HttpPut("user/{name}")]
         public ActionResult UpdateUser(string name, [FromBody]string newName)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var isExist = dbContext.Users.FirstOrDefault(u => u.Name == newName);
             if (isExist == null)
             {
@@ -75,6 +126,10 @@ namespace Users.Controllers
         [HttpDelete("user/{name}")]
         public ActionResult DeleteUser(string name)
         {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
             var user = dbContext.Users.FirstOrDefault(u => u.Name == name);
             if(user != null)
             {
