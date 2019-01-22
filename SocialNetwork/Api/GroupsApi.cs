@@ -1,5 +1,6 @@
 ﻿using Groups;
 using Groups.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SocialNetwork.Models.Groups;
@@ -26,12 +27,12 @@ namespace SocialNetwork.Api
 
         }
 
-        public virtual Group FindGroupByName(string name)
+        public virtual (int,Group) FindGroupByName(string name)
         {
             CheckAuthorization();
             var groupResponse = GetRequest($"{address}groups/group/{name}");
             if (groupResponse.StatusCode != System.Net.HttpStatusCode.OK && groupResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
-                return null;
+                return ((int)groupResponse.StatusCode,null);
             if (groupResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}groups", GroupsCredenntials.Login, GroupsCredenntials.Password);
@@ -39,7 +40,7 @@ namespace SocialNetwork.Api
             }
             string jsonResponse = groupResponse.Content.ReadAsStringAsync().Result;
             var group = JsonConvert.DeserializeObject<Group>(jsonResponse);
-            return group;
+            return (200,group);
         }
 
         public virtual Group FindGroupById(int id)

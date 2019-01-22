@@ -116,6 +116,46 @@ namespace Posts.Controllers
             return StatusCode(400);
         }
 
+        [HttpPut("post/{idold}/group")]
+        public ActionResult UpdatePostGroup(int idold, [FromBody] Post group)
+        {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
+            var posts = dbContext.Posts.Where(p => p.Group == idold);
+            if (posts != null)
+            {
+                foreach (var post in posts)
+                {
+                    post.Group = group.Group;
+                    dbContext.Posts.Update(post);
+                }
+                return StatusCode(200);
+            }
+            return StatusCode(400);
+        }
+
+        [HttpPut("post/group/{id}")]
+        public ActionResult AddExtGroup(int id, [FromBody] string ext)
+        {
+            var res = CheckToken(HttpContext);
+            if (!res.Value)
+                return res.Result;
+
+            var posts = dbContext.Posts.Where(p => p.Group == id);
+            if (posts != null)
+            {
+                foreach (var post in posts)
+                {
+                    post.Text = ext + "\n" + post.Text;
+                    dbContext.Posts.Update(post);
+                }
+                return StatusCode(200);
+            }
+            return StatusCode(400);
+        }
+
         [HttpPost("post")]
         public ActionResult AddPost([FromBody]Post post)
         {

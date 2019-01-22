@@ -23,6 +23,8 @@ namespace SocialNetwork.Api
         {
             var data = new Models.Auth { Login = login, Pass = pass };
             var response = PostRequest($"{address}/auth", data);
+            if (!response.IsSuccessStatusCode)
+                return null;
             string token = response.Content.ReadAsStringAsync().Result;
             return token;
         }
@@ -31,9 +33,16 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                return client.PostAsync(address,
-                    new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
+                try
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    return client.PostAsync(address,
+                        new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")).Result;
+                }
+                catch
+                {
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                }
             }
         }
 
@@ -41,8 +50,15 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                return client.GetAsync(address).Result;
+                try
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    return client.GetAsync(address).Result;
+                }
+                catch
+                {
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                }
             }
         }
 
@@ -50,8 +66,15 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                return client.PutAsJsonAsync<Group>(address+extadd.ToString(), obj).Result;
+                try
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    return client.PutAsJsonAsync<Group>(address + extadd.ToString(), obj).Result;
+                }
+                catch
+                {
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                }
             }
         }
 
@@ -59,8 +82,15 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                return client.PutAsJsonAsync<Post>(address + extadd.ToString(), obj).Result;
+                try
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    return client.PutAsJsonAsync<Post>(address + extadd.ToString(), obj).Result;
+                }
+                catch
+                {
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                }
             }
         }
 
@@ -68,8 +98,15 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                return client.PutAsJsonAsync<string>(address + extadd.ToString(), obj).Result;
+                try
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    return client.PutAsJsonAsync<string>(address + extadd.ToString(), obj).Result;
+                }
+                catch
+                {
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                }
             }
         }
 
@@ -77,8 +114,15 @@ namespace SocialNetwork.Api
         {
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                return client.DeleteAsync(address + extadd.ToString()).Result;
+                try
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    return client.DeleteAsync(address + extadd.ToString()).Result;
+                }
+                catch
+                {
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                }
             }
         }
     }

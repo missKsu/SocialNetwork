@@ -33,7 +33,7 @@ namespace AuthorizationServer.Controllers
         [HttpGet("account/login")]
         public async Task<IActionResult> Login(string returnUrl)
         {
-            return await Login(new LoginModel { ReturnUrl = returnUrl});
+            return View(new LoginModel { ReturnUrl = returnUrl });
         }
 
         [HttpPost]

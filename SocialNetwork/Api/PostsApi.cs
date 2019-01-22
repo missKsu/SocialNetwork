@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Groups.Entities;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Posts;
 using Posts.Entities;
@@ -102,6 +103,38 @@ namespace SocialNetwork.Api
             }
             return response;
         }
+
+        
+
+        public HttpResponseMessage EditPostGroup(int id, int groupId)
+        {
+            CheckAuthorization();
+            var group = new Post { Group = groupId};
+            var response = PutRequest($"{address}posts/post/{id}/group","", group);
+            if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                token = Authorize($"{address}posts", PostsCredentials.Login, PostsCredentials.Password);
+                response = PutRequest($"{address}posts/post/{id}/group", "", new Post { Group = groupId });
+            }
+            return response;
+        }
+
+        public HttpResponseMessage EditExtPost(int id, string ext)
+        {
+            CheckAuthorization();
+            var response = PutRequest($"{address}posts/post/group/{id}", "", ext);
+            if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                return null;
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                token = Authorize($"{address}posts", PostsCredentials.Login, PostsCredentials.Password);
+                response = PutRequest($"{address}posts/post/group/{id}", "", ext);
+            }
+            return response;
+        }
+
 
         public HttpResponseMessage DeletePost(int id)
         {

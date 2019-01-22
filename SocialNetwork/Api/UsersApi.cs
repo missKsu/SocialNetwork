@@ -28,14 +28,21 @@ namespace SocialNetwork.Api
 
         public User FindUser(string name)
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var usersResponse = GetRequest($"{address}users/name/{name}");
+            if (usersResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (usersResponse.StatusCode != System.Net.HttpStatusCode.OK && usersResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (usersResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return null;
                 usersResponse = GetRequest($"{address}users/name/{name}");
+                if (usersResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
             var user = JsonConvert.DeserializeObject<User>(jsonString);
@@ -60,14 +67,19 @@ namespace SocialNetwork.Api
 
         public virtual UserModel FindUsersById(int id)
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var usersResponse = GetRequest($"{address}users/id/{id}");
+            if (usersResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (usersResponse.StatusCode != System.Net.HttpStatusCode.OK && usersResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (usersResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
                 usersResponse = GetRequest($"{address}users/id/{id}");
+                if (usersResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
             var users = JsonConvert.DeserializeObject<User>(jsonString);
@@ -78,14 +90,21 @@ namespace SocialNetwork.Api
 
         public UserModel AddUser(UserModel userModel)
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var response = PostRequest($"{address}users", Convert(userModel));
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return null;
                 response = PostRequest($"{address}users", Convert(userModel));
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return userModel;
@@ -94,14 +113,21 @@ namespace SocialNetwork.Api
 
         public UserModel AddUser(User user)
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var response = PostRequest($"{address}users", Convert(user));
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return null;
                 response = PostRequest($"{address}users", Convert(user));
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return Convert(user);
@@ -110,14 +136,21 @@ namespace SocialNetwork.Api
 
         public UserModel EditUser(string name, string newName)
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var response = PutRequest($"{address}users/user/", name, newName);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return null;
                 response = PutRequest($"{address}users/user/", name, newName);
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return new UserModel { Name = newName};
@@ -126,29 +159,43 @@ namespace SocialNetwork.Api
 
         public HttpResponseMessage DeleteUser(string name)
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var response = DeleteRequest($"{address}users/user/", name);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return null;
                 response = DeleteRequest($"{address}users/user/", name);
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             return response;
         }
 
         public UserModel EditUser(string name, UserModel userModel)
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var newName = userModel.Name;
             var response = PutRequest($"{address}users/user/",name, newName);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return null;
                 response = DeleteRequest($"{address}users/user/", name);
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return userModel;
@@ -157,14 +204,21 @@ namespace SocialNetwork.Api
 
         public AllUsersModel GetAllUsers()
         {
-            CheckAuthorization();
+            if (!CheckAuthorization())
+                return null;
             var usersResponse = GetRequest($"{address}users/");
+            if (usersResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
             if (usersResponse.StatusCode != System.Net.HttpStatusCode.OK && usersResponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)
                 return null;
             if (usersResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return null;
                 usersResponse = GetRequest($"{address}users/");
+                if (usersResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
             }
             string jsonString = usersResponse.Content.ReadAsStringAsync().Result;
             var users = JsonConvert.DeserializeObject<List<User>>(jsonString);
@@ -191,13 +245,16 @@ namespace SocialNetwork.Api
             return Users;
         }
 
-        private void CheckAuthorization()
+        private bool CheckAuthorization()
         {
             if (!Authorized)
             {
                 token = Authorize($"{address}users", UsersCredenntials.Login, UsersCredenntials.Password);
+                if (token is null)
+                    return false;
                 Authorized = true;
             }
+            return true;
         }
     }
 }

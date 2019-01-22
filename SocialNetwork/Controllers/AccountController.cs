@@ -107,15 +107,6 @@ namespace SocialNetwork.Controllers
             }
         }
 
-        [HttpGet("oauth/showcode")]
-        public IActionResult OAuthShowCodeCallback(string code, string scope)
-        {
-            using (var client = new HttpClient())
-            {
-                return base.StatusCode(200, code);
-            }
-        }
-
         [HttpGet("oauth/code")]
         public IActionResult OAuthCodeCallback(string code, string scope)
         {

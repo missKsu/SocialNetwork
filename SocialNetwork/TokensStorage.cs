@@ -1,4 +1,5 @@
-﻿using SocialNetwork.Identity;
+﻿using IdentityModel.Client;
+using SocialNetwork.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace SocialNetwork
 
         public void AddToken(string token, string refreshToken)
         {
+            if (token is null)
+                return;
             dict.Add(token, (DateTime.Now + TimeSpan.FromSeconds(600), refreshToken));
             //tokens.Add(new Tuple<string, int>(token, date));
         }
@@ -21,6 +24,10 @@ namespace SocialNetwork
         {
             if (token == "")
                 return AuthorizeResult.NoToken;
+            var client = new IntrospectionClient("http://localhost:5005/connect/introspect", "api", "api-secret");
+            var resp = client.SendAsync(new IntrospectionRequest { Token = token }).Result;
+            if (resp.IsActive)
+                return AuthorizeResult.Succeed;
             var result = dict.ContainsKey(token);
             if (!result)
                 return AuthorizeResult.WrongToken;

@@ -14,6 +14,7 @@ using SocialNetwork.Models.Permissions;
 using SocialNetwork.Models.Posts;
 using SocialNetwork.Pagination;
 using SocialNetwork.Identity;
+using SocialNetwork.Infrastructure;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -60,6 +61,10 @@ namespace SocialNetwork.Controllers
             return true;
         }
 
+        private ActionResult WriteAnswer(int code)
+        {
+            return StatusCode(code,"server are not allowed. Try later");
+        }
 
         [HttpGet("groups/{name}")]
         public ActionResult<GroupModel> FindGroupByName(string name)
@@ -68,10 +73,11 @@ namespace SocialNetwork.Controllers
             if (!res.Value)
                 return res.Result;
 
-            var group = groupsApi.FindGroupByName(name);
-            if (group == null)
+            var groupResponse = groupsApi.FindGroupByName(name);
+            var group = groupResponse.Item2;
+            if (groupResponse.Item1 != 200)
             {
-                return StatusCode(404);
+                return WriteAnswer(groupResponse.Item1);
             }
             var userName = usersApi.FindUsersById(group.Creator);
             if (userName == null)
@@ -143,6 +149,7 @@ namespace SocialNetwork.Controllers
         [HttpGet("groups")]
         public ActionResult<List<GroupModel>> GetAllGroups()
         {
+            interfaceOperation = true;
             var res = CheckToken(HttpContext);
             if (!res.Value)
                 return res.Result;
@@ -156,6 +163,8 @@ namespace SocialNetwork.Controllers
                     var creator = usersApi.FindUsersById(group.Creator);
                     if (creator != null)
                         groups.Add(new GroupModel { Name = group.Name, Description = group.Description, Creator = creator.Name });
+                    else
+                        groups.Add(new GroupModel { Name = group.Name, Description = group.Description, Creator = "" });
                 }
             }
             return groups;
@@ -193,7 +202,8 @@ namespace SocialNetwork.Controllers
                 return res.Result;
 
             var posts = new List<PostModel> { };
-            var groupId = groupsApi.FindGroupByName(group);
+            var groupResponse = groupsApi.FindGroupByName(group);
+            var groupId = groupResponse.Item2;
             if (groupId == null)
                 return new PaginatedList<PostModel>(posts, 0, 0, 0);
             if (perpage == 0)
@@ -243,8 +253,42 @@ namespace SocialNetwork.Controllers
         [HttpPut("groups/merge/{group}")]
         public ActionResult<GroupModel> MergeOneGroupWithAnother(string group, string with)
         {
+            Repeater.EnqueueJob(() =>
+            {
+                var groupResponse = groupsApi.FindGroupByName(group);
+                if (groupResponse.Item2 is null)
+                    return false;
+                var group1 = groupResponse.Item2;
+                groupResponse = groupsApi.FindGroupByName(with);
+                if (groupResponse.Item2 is null)
+                    return false;
+                var group2 = groupResponse.Item2;
+                var resultGroup = groupsApi.DeleteGroup(group2.Name);
+                if (!resultGroup.IsSuccessStatusCode)
+                    return false;
+                Repeater.EnqueueJob(() =>
+                {
+                    var resultPosts = postsApi.EditPostGroup(group2.Id, group1.Id);
+                    return resultPosts.IsSuccessStatusCode;
+                }, 5);
+                return true;
+            }, 5);
+            return StatusCode(200);
+        }
 
-            return null;
+        [HttpPut("groups/ext/{group}")]
+        public ActionResult<GroupModel> AddExtGroup(string group, string ext)
+        {
+            var groupResponse = groupsApi.FindGroupByName(group);
+            var group1 = groupResponse.Item2;
+            var updateResponse = groupsApi.EditGroup(group1.Name, ext + " " + group1.Name, group1.Description);
+            if (updateResponse.StatusCode != System.Net.HttpStatusCode.OK)
+                return StatusCode(400);
+            var postResponse = postsApi.EditExtPost(group1.Id,ext);
+            if (updateResponse.StatusCode == System.Net.HttpStatusCode.OK)
+                return StatusCode(200);
+            updateResponse = groupsApi.EditGroup(ext + " " + group1.Name, group1.Name, group1.Description);
+            return StatusCode(400);
         }
 
         [Authorize]
@@ -277,7 +321,12 @@ namespace SocialNetwork.Controllers
         {
             interfaceOperation = true;
             var author = usersApi.FindIdUserByName(postModel.Author);
-            var group = groupsApi.FindGroupByName(postModel.Group);
+            var groupResponse = groupsApi.FindGroupByName(postModel.Group);
+            var group = groupResponse.Item2;
+            if (groupResponse.Item1 != 200)
+            {
+                return WriteAnswer(groupResponse.Item1);
+            }
             if (author == -1)
                 return RedirectToAction(nameof(MessagePage), new { message = "No such user!" });
             var permission = permissionsApi.GetPermissionForUserByGroup(author, group.Id);
@@ -331,7 +380,12 @@ namespace SocialNetwork.Controllers
         {
             interfaceOperation = true;
             var creator = usersApi.FindIdUserByName(groupModel.Creator);
-            var group = groupsApi.FindGroupByName(groupModel.GroupName);
+            var groupResponse = groupsApi.FindGroupByName(groupModel.GroupName);
+            var group = groupResponse.Item2;
+            if (groupResponse.Item1 != 200)
+            {
+                return WriteAnswer(groupResponse.Item1);
+            }
             if (creator == -1)
                 return RedirectToAction(nameof(MessagePage), new { message = "No such user!" });
             var permission = permissionsApi.GetPermissionForUserByGroup(creator, group.Id);
@@ -356,7 +410,12 @@ namespace SocialNetwork.Controllers
         public ActionResult EditGroupIf(string name)
         {
             interfaceOperation = true;
-            var group = groupsApi.FindGroupByName(name);
+            var groupResponse = groupsApi.FindGroupByName(name);
+            var group = groupResponse.Item2;
+            if (groupResponse.Item1 != 200)
+            {
+                return WriteAnswer(groupResponse.Item1);
+            }
             var modifiedGroup = new EditGroupModel { Name = group.Name, NewName = group.Name, Creator = group.Creator, Description = group.Description, NewDescription = group.Description};
             return View(modifiedGroup);
         }
@@ -366,7 +425,12 @@ namespace SocialNetwork.Controllers
         public ActionResult<GroupModel> EditGroupByIf(EditGroupModel groupModel)
         {
             interfaceOperation = true;
-            var group = groupsApi.FindGroupByName(groupModel.Name);
+            var groupResponse = groupsApi.FindGroupByName(groupModel.Name);
+            var group = groupResponse.Item2;
+            if (groupResponse.Item1 != 200)
+            {
+                return WriteAnswer(groupResponse.Item1);
+            }
             var permission = permissionsApi.GetPermissionForUserByGroup(groupModel.Creator, group.Id);
             if (permission == null)
                 return RedirectToAction(nameof(MessagePage), new { message = "No information about permission for this group!" });
@@ -434,7 +498,12 @@ namespace SocialNetwork.Controllers
         public ActionResult<PostModel> EditPostByIf(EditPostModel postModel)
         {
             interfaceOperation = true;
-            var group = groupsApi.FindGroupByName(postModel.Group);
+            var groupResponse = groupsApi.FindGroupByName(postModel.Group);
+            var group = groupResponse.Item2;
+            if (groupResponse.Item1 != 200)
+            {
+                return WriteAnswer(groupResponse.Item1);
+            }
             var creator = usersApi.FindIdUserByName(postModel.Creator);
             var permission = permissionsApi.GetPermissionForUserByGroup(creator, group.Id);
             if (permission == null)
@@ -502,7 +571,8 @@ namespace SocialNetwork.Controllers
             switch (permissionModel.ObjectType)
             {
                 case "Group":
-                    var group = groupsApi.FindGroupByName(permissionModel.ObjectName);
+                    var groupResponse = groupsApi.FindGroupByName(permissionModel.ObjectName);
+                    var group = groupResponse.Item2;
                     if (group == null)
                         break;
                     permission.ObjectType = Permissions.Entities.Object.Group;

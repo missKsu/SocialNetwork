@@ -15,7 +15,17 @@ namespace AuthorizationServer
         {
             return new List<ApiResource>
             {
-                new ApiResource("api", "API")
+                new ApiResource
+                {
+                    Name = "api",
+                    DisplayName = "my Api",
+                    ApiSecrets = new [] { new Secret("api-secret".Sha256()) },
+                    Scopes =
+                    {
+                        new Scope(IdentityServerConstants.StandardScopes.OfflineAccess),
+                        new Scope("api")
+                    }
+                }
             };
         }
 
